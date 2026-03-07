@@ -1,7 +1,4 @@
-#                                                           UNDER CONSTRUCTION 
-
-
-
+# UNDER CONSTRUCTION
 
 # 🧠 Decentralized AI Model Marketplace
 
@@ -21,15 +18,15 @@
 
 ## 🏗️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React.js, TailwindCSS, ethers.js, Vite |
-| **Backend** | Java 17, Spring Boot 3, Maven |
+| Layer          | Technology                                         |
+| -------------- | -------------------------------------------------- |
+| **Frontend**   | React.js, TailwindCSS, ethers.js, Vite             |
+| **Backend**    | Java 17, Spring Boot 3, Maven                      |
 | **Blockchain** | Solidity, Hardhat, Web3j, Ethereum Sepolia Testnet |
-| **Storage** | IPFS via Pinata |
-| **Auth** | MetaMask Wallet + JWT |
-| **Database** | MongoDB |
-| **ML Service** | Python FastAPI |
+| **Storage**    | IPFS via Pinata                                    |
+| **Auth**       | MetaMask Wallet + JWT                              |
+| **Database**   | MongoDB                                            |
+| **ML Service** | Python FastAPI                                     |
 
 ---
 
@@ -52,45 +49,65 @@ decentralized-ai-marketplace/
 
 ### 🔗 `blockchain/` — Smart Contracts
 
+This folder contains the Solidity contracts that manage model ownership, access rights, and payments. It is a standard Hardhat project with unit tests and a simple deploy script.
+
 ```
 blockchain/
 ├── contracts/
-│   ├── ModelRegistry.sol       # Stores model info (name, IPFS hash, owner, price) on-chain
-│   ├── Marketplace.sol         # Handles ETH payments and grants access to buyers
-│   └── AccessControl.sol       # Checks who has permission to use which model
+│   ├── ModelRegistry.sol       # Stores model metadata (name, IPFS hash, price, owner)
+│   ├── Marketplace.sol         # Handles payments, access grants, and fee splitting
+│   └── AccessControl.sol       # Simple role-based access control (OWNER/VIEWER/EDITOR/ADMIN)
 │
 ├── scripts/
-│   ├── deploy.js               # Run this to deploy contracts to Sepolia testnet
-│   └── verify.js               # Verifies your contracts on Etherscan (optional but nice)
+│   └── deploy.js               # Deploys the Marketplace (and inherited contracts) to a network
 │
 ├── test/
-│   ├── ModelRegistry.test.js   # Tests: can register model, can transfer ownership
-│   └── Marketplace.test.js     # Tests: can buy access, cant buy twice, payment splits correctly
+│   ├── ModelRegistry.test.js   # Unit tests: register model, transfer ownership
+│   └── Marketplace.test.js     # Unit tests: purchase flow, no double purchases
 │
-├── deployments/
-│   ├── ModelRegistry.json      # Auto-generated after deploy — has ABI + contract address
-│   └── Marketplace.json        # Auto-generated after deploy — has ABI + contract address
-│
-├── hardhat.config.js           # Hardhat settings: which network, solidity version, API keys
-└── package.json                # Hardhat dependencies (ethers, hardhat, chai for testing)
+├── artifacts/                  # Build artifacts (Hardhat output)
+├── cache/                      # Hardhat cache
+├── hardhat.config.js           # Hardhat configuration (Solidity version + optimizer)
+├── package.json                # Hardhat dependencies (ethers, chai, mocha, etc.)
+└── package-lock.json           # Lockfile
 ```
 
 **What each contract does:**
 
 `ModelRegistry.sol`
-- Lets a developer register their model by giving it a name, IPFS file hash, and price
-- Stores: modelId, name, ipfsHash, price, owner wallet address, active status
-- Owner can transfer the model to someone else or deactivate it
+
+- Register a model with a name, IPFS hash, price, and owner address.
+- Stores: modelId, name, ipfsHash, price, owner, active flag.
+- Owner can transfer model ownership.
 
 `Marketplace.sol`
-- Buyer calls `purchaseAccess(modelId)` and sends ETH
-- Contract sends 95% to model owner, 5% kept as platform fee
-- Records that this buyer now has access
-- `hasAccess(modelId, userAddress)` returns true/false — used by backend before inference
+
+- Buyers call `purchaseAccess(modelId)` and send ETH.
+- Contract splits payment: 95% to model owner, 5% to platform.
+- Records that the buyer has access via `buyerAccess[modelId][buyer]`.
+- `hasAccess(modelId, userAddress)` returns whether the buyer has purchased access.
 
 `AccessControl.sol`
-- Owner can assign roles to wallets: VIEWER, EDITOR, ADMIN
-- Backend calls `checkAccess()` to see what a user is allowed to do
+
+- The deployer becomes the contract owner.
+- Owner can assign roles (NONE, VIEWER, EDITOR, ADMIN) to addresses.
+- Backend can check a user’s role via `checkAccess()`.
+
+### 🧪 Running the blockchain tests and deploy script
+
+```bash
+cd blockchain
+npm install
+npx hardhat test
+```
+
+To deploy locally (Hardhat network):
+
+```bash
+npx hardhat run scripts/deploy.js
+```
+
+> Note: This repo does not currently configure any public testnet (Sepolia) endpoints. To deploy to a live network, add a network section to `hardhat.config.js` and provide a private key + RPC URL via environment variables.
 
 ---
 
@@ -230,6 +247,7 @@ ml-service/
 ## 🔐 Core Algorithms (Simple Version)
 
 ### Wallet Login Flow
+
 ```
 1. User clicks "Connect Wallet" → MetaMask opens
 2. Frontend asks user to sign a message like "Login to AI Marketplace - timestamp"
@@ -240,6 +258,7 @@ ml-service/
 ```
 
 ### Upload a Model
+
 ```
 1. User fills form (name, price, description) and picks a file
 2. Frontend signs an auth message and sends everything to POST /api/models
@@ -251,6 +270,7 @@ ml-service/
 ```
 
 ### Buy a Model
+
 ```
 1. User clicks Buy on ModelDetail page
 2. Frontend calls Marketplace.sol → purchaseAccess(modelId) with ETH value
@@ -261,6 +281,7 @@ ml-service/
 ```
 
 ### Run Inference
+
 ```
 1. User enters input data and clicks Run
 2. Frontend calls POST /api/infer with { modelId, inputData }
@@ -277,6 +298,7 @@ ml-service/
 ## ⚙️ Setup
 
 ### Prerequisites
+
 - Java 17+, Maven 3.8+
 - Node.js 18+
 - Python 3.10+
@@ -284,13 +306,16 @@ ml-service/
 - MetaMask installed in browser
 
 ### Step 1 — Clone
+
 ```bash
 git clone https://github.com/yourusername/decentralized-ai-marketplace.git
 cd decentralized-ai-marketplace
 ```
 
 ### Step 2 — Configure Backend
+
 Edit `backend/src/main/resources/application.properties`:
+
 ```properties
 server.port=8080
 spring.data.mongodb.uri=mongodb://localhost:27017/ai-marketplace
@@ -308,7 +333,9 @@ mlservice.url=http://localhost:8000
 ```
 
 ### Step 3 — Configure Frontend
+
 Create `frontend/.env`:
+
 ```env
 VITE_API_URL=http://localhost:8080
 VITE_CONTRACT_REGISTRY=0xPasteAddressAfterDeploy
@@ -317,6 +344,7 @@ VITE_CHAIN_ID=11155111
 ```
 
 ### Step 4 — Deploy Smart Contracts
+
 ```bash
 cd blockchain
 npm install
@@ -326,6 +354,7 @@ npx hardhat run scripts/deploy.js --network sepolia
 ```
 
 ### Step 5 — Start Backend
+
 ```bash
 cd backend
 mvn spring-boot:run
@@ -333,6 +362,7 @@ mvn spring-boot:run
 ```
 
 ### Step 6 — Start ML Service
+
 ```bash
 cd ml-service
 pip install -r requirements.txt
@@ -340,6 +370,7 @@ uvicorn main:app --reload --port 8000
 ```
 
 ### Step 7 — Start Frontend
+
 ```bash
 cd frontend
 npm install
@@ -351,21 +382,22 @@ npm run dev
 
 ## 📊 API Endpoints
 
-| Method | Endpoint | Auth | What it does |
-|--------|----------|------|-------------|
-| POST | `/api/auth/verify` | No | Login with wallet signature, returns JWT |
-| GET | `/api/models` | No | Get all models |
-| GET | `/api/models/{id}` | No | Get one model by ID |
-| POST | `/api/models` | JWT | Upload a new model |
-| POST | `/api/purchase/record` | JWT | Save a completed purchase to DB |
-| POST | `/api/infer` | JWT | Run inference on a model |
-| GET | `/api/users/{address}` | No | Get user profile |
+| Method | Endpoint               | Auth | What it does                             |
+| ------ | ---------------------- | ---- | ---------------------------------------- |
+| POST   | `/api/auth/verify`     | No   | Login with wallet signature, returns JWT |
+| GET    | `/api/models`          | No   | Get all models                           |
+| GET    | `/api/models/{id}`     | No   | Get one model by ID                      |
+| POST   | `/api/models`          | JWT  | Upload a new model                       |
+| POST   | `/api/purchase/record` | JWT  | Save a completed purchase to DB          |
+| POST   | `/api/infer`           | JWT  | Run inference on a model                 |
+| GET    | `/api/users/{address}` | No   | Get user profile                         |
 
 ---
 
 ## 📦 Key Dependencies
 
 **`pom.xml` (Java)**
+
 ```xml
 spring-boot-starter-web           <!-- REST API -->
 spring-boot-starter-security      <!-- JWT + route protection -->
@@ -375,6 +407,7 @@ jjwt-api + jjwt-impl              <!-- Create and validate JWT tokens -->
 ```
 
 **`package.json` (Frontend)**
+
 ```
 react, react-router-dom   — UI and routing
 ethers                    — Talk to MetaMask and smart contracts
@@ -383,6 +416,7 @@ tailwindcss               — Styling
 ```
 
 **`requirements.txt` (Python)**
+
 ```
 fastapi, uvicorn          — Web server
 scikit-learn, torch       — Run ML models
