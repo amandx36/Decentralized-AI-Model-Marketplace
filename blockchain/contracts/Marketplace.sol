@@ -2,8 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "../contracts/ModelRegistry.sol";
+import "./AccessControl.sol";
 
-contract Marketplace is ModelRegistry {
+
+contract Marketplace is ModelRegistry, AccessControl {
+
     // store which buyer purchase which model
     mapping(uint256 => mapping(address => bool)) public buyerAccess;
 
@@ -28,15 +31,23 @@ contract Marketplace is ModelRegistry {
 
     // 1. user calls purchaseAccess(modelId) and sends
     function purchaseAccess(uint256 modelId) public payable {
+
+        // check if model exists
+        require(modelId > 0 && modelId <= modelCount, "Model not found");
+
         // 2. get model information from ModelRegistry
-        Model memory model = models[modelId];
+        Model storage model = models[modelId];
+
         // 3. check if model exists and active
         require(model.active == true, "Model is Inactive");
+
         // 4. check if ETH sent >= model price
         // get the ETH send by buyer is enough or not   obtain by msg.value
         require(msg.value >= model._price, "Not Enough Etherium ");
+
         // 5. check if buyer already purchased
         require(!buyerAccess[modelId][msg.sender], "Already Purchased");
+
         // 6. calculate payment split
         uint256 ownerShare = (msg.value * 95) / 100;
         uint256 platformShare = (msg.value * 5) / 100;
@@ -47,16 +58,15 @@ contract Marketplace is ModelRegistry {
 
         // send platformShare to platform wallet
         payable(platFormWallet).transfer(platformShare);
+
         // 8. record buyer access
         buyerAccess[modelId][msg.sender] = true;
 
         // 9. event emitted when a buyer purchases a model
-
         emit PurchaseSucessfull(modelId, msg.sender, msg.value);
     }
 
     // check buyerAccess
-
     function hasAccess(
         uint256 modelId,
         address user

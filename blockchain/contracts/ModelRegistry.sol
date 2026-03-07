@@ -41,6 +41,7 @@ contract ModelRegistry {
 
         return models[_modelId];
     }
+
     // Transfer ownership of a model
     function transferModel(uint256 _modelId, address _newOwner) public {
         require(_modelId > 0 && _modelId <= modelCount, "Model not found");
