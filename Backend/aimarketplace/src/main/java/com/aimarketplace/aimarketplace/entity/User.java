@@ -80,6 +80,12 @@ public class User {
     @Field("modified_at")
     private  Instant modifiedAt ;
 
+    @Field("wallet_address")
+    private String walletAddess ;
+
+    // for storing nonce
+    @Field("nonce")
+    private String nonce ;
     // making foreign key
     @DBRef
     @Field("role")
