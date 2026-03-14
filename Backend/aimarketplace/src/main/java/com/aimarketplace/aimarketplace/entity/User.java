@@ -8,6 +8,7 @@ import java.util.Set;
 
 //for making the collection/table  in mongodb
 
+import com.aimarketplace.aimarketplace.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

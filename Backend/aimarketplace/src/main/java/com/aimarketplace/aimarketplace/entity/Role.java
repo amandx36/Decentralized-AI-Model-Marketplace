@@ -1,6 +1,7 @@
 package com.aimarketplace.aimarketplace.entity;
 
 
+import com.aimarketplace.aimarketplace.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,8 @@ public class Role {
     @Field("description")
     private String description;
 
-    public  Role(ERole  role , String description){
+    // constructor
+    public  Role(ERole role , String description){
        // return the name inside the enum dude
         this.name  = role.name() ;
         this.description = description ;

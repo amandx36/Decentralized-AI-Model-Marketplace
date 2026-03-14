@@ -1,6 +1,6 @@
 package com.aimarketplace.aimarketplace.repository;
 
-import com.aimarketplace.aimarketplace.entity.ERole;
+import com.aimarketplace.aimarketplace.enums.ERole;
 import com.aimarketplace.aimarketplace.entity.Role;
 import com.aimarketplace.aimarketplace.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;

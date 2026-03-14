@@ -1,4 +1,4 @@
-package com.aimarketplace.aimarketplace.entity;
+package com.aimarketplace.aimarketplace.enums;
 
 public enum ERole {
     ROLE_USER,
