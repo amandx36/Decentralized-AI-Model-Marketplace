@@ -35,7 +35,7 @@ public class SecurityConfig {
                         )
                 // classifying the which request what to do
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/auth/login")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/health")).permitAll()
                         .anyRequest().authenticated()
                 )

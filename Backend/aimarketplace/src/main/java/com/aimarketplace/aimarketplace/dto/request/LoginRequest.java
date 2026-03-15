@@ -9,7 +9,7 @@ import java.security.Signature;
 @Data
 public class LoginRequest {
     private  String userName ;
-    private  String WalletAddress ;
-    private String Signature ;
-    private String password ;
+    private  String walletAddress ;
+    private String signature ;
+
 }

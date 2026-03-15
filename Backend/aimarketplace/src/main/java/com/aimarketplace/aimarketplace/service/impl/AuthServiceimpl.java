@@ -2,6 +2,7 @@ package com.aimarketplace.aimarketplace.service.impl;
 
 import com.aimarketplace.aimarketplace.dto.request.LoginRequest;
 import com.aimarketplace.aimarketplace.dto.response.LoginResponse;
+import com.aimarketplace.aimarketplace.entity.User;
 import com.aimarketplace.aimarketplace.repository.UserRepository;
 import com.aimarketplace.aimarketplace.security.jwt.JwtService;
 import com.aimarketplace.aimarketplace.service.AuthService;
@@ -23,16 +24,19 @@ public class AuthServiceimpl implements AuthService {
 
     @Override
     public LoginResponse verifyLogin(LoginRequest request) {
-    if(request.getUserName() == null){
-        return new LoginResponse("User not Found",null,"404");
-    }
+   // check is exist in the database other wise create it
+        User user = userRepository.findByWalletAddress(request.getWalletAddress()).orElseGet(()->{
+        User newUser = new User();
+        newUser.setWalletAddress(request.getWalletAddress());
+        return userRepository.save(newUser);
+        });
 
     // generate  the jwt token
         String token = jwtService.generateToken(request.getWalletAddress());
     return new LoginResponse(
             "Login Sucessfully ",
             token,
-            "202"
+            "200"
     );
     }
 }
