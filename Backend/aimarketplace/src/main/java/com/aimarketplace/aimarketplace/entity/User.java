@@ -83,7 +83,7 @@ public class User {
     private  Instant modifiedAt ;
 
     @Field("wallet_address")
-    private String walletAddess ;
+    private String walletAddress ;
 
     // for storing nonce
     @Field("nonce")
