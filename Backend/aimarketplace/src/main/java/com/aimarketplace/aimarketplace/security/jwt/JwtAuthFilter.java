@@ -1,5 +1,8 @@
 package com.aimarketplace.aimarketplace.security.jwt;
 
+import com.aimarketplace.aimarketplace.entity.User;
+import com.aimarketplace.aimarketplace.repository.UserRepository;
+import com.aimarketplace.aimarketplace.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,12 +14,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 // This filter runs once for every HTTP request
 
+
+    // making custom object for UserPrinciple
     @Autowired
+    private UserRepository userRepository;
+
+
     private JwtService jwtService;
     // JwtUtils is used to decode and extract information from the JWT token
 
@@ -45,15 +54,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // principal = walletAddress (identity of the user)
             // credentials = null (JWT already verified)
             // authorities = null (roles not included here)
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(walletAddress, null, null);
 
-            // Store authentication in the Security Context
-            // This tells Spring Security that the user is authenticated
-            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            Optional<User> optionalUser = userRepository.findByWalletAddress(walletAddress);
+
+            if (optionalUser.isPresent()) {
+
+                User user = optionalUser.get();
+
+                UserPrincipal principal = new UserPrincipal(user);
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                principal,
+                                null,
+                                principal.getAuthorities()
+                        );
+
+                // Store authentication in the Security Context
+                // This tells Spring Security that the user is authenticated
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+
+            //  Continue the request to the next filter or controller
+            chain.doFilter(request, response);
         }
 
-        //  Continue the request to the next filter or controller
-        chain.doFilter(request, response);
     }
 }

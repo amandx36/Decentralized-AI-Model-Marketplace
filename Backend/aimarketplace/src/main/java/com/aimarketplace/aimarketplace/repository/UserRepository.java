@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository<User, String> {
 
     Optional<User> findByUsername(String username);
-
+    Optional<User> findByWalletAddress(String walletAddress);
     Optional<User> findByEmail(String email);
 
     @Query("{ $or: [ { 'username': ?0 }, { 'email': ?1 } ] }")

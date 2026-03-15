@@ -1,5 +1,6 @@
-package com.aimarketplace.aimarketplace.security.jwt;
+package com.aimarketplace.aimarketplace.security;
 
+import com.aimarketplace.aimarketplace.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

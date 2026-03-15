@@ -3,7 +3,6 @@ package com.aimarketplace.aimarketplace.service.impl;
 import com.aimarketplace.aimarketplace.dto.request.LoginRequest;
 import com.aimarketplace.aimarketplace.dto.response.LoginResponse;
 import com.aimarketplace.aimarketplace.repository.UserRepository;
-import com.aimarketplace.aimarketplace.security.jwt.JwtAuthFilter;
 import com.aimarketplace.aimarketplace.security.jwt.JwtService;
 import com.aimarketplace.aimarketplace.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
