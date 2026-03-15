@@ -1,4 +1,4 @@
-package com.aimarketplace.aimarketplace.security.jwt;
+package com.aimarketplace.aimarketplace.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ public class SecurityConfig {
 
         http
                 // Disable CSRF (commonly disabled for REST APIs using JWT)
-                // CSRF  = cross site request forgery 
+                // CSRF  = cross site request forgery
                 .csrf().disable()
 
                 // Define authorization rules

@@ -4,6 +4,7 @@ package com.aimarketplace.aimarketplace.entity;
 import java.time.Instant;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 //for making the collection/table  in mongodb
@@ -87,6 +88,14 @@ public class User {
     // for storing nonce
     @Field("nonce")
     private String nonce ;
+
+
+    @Field("owned_model")
+    private List<String> ownedModel;
+    @Field("purchased_model")
+    private List<String> purchasedModel;
+
+
     // making foreign key
     @DBRef
     @Field("role")

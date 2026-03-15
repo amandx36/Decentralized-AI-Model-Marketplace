@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
 
+
 @Document(collection = "role")
 @NoArgsConstructor
 @AllArgsConstructor
