@@ -19,10 +19,9 @@ public class JwtService {
 
 
     // for set signing key
-    private SecretKey getSigningKey(){
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
-
 
 
     // Generate JWT token
@@ -36,6 +35,7 @@ public class JwtService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -46,29 +46,27 @@ public class JwtService {
 
 
     // Extract wallet address from JWT
-    public String extractWalletAddress(String token){
-        return  extractAllClaims(token).getSubject();
+    public String extractWalletAddress(String token) {
+        return extractAllClaims(token).getSubject();
     }
 
     // extract the expiration
-    public Date extractExpiration(String token ){
+    public Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration();
 
     }
 
     // check is token is expired or not
-    private  boolean isTokenExpired(String token ){
+    private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
 
-// is token isValidToken
-public boolean isValidToken(String token, String walletAddress) {
-    final String extractedWallet = extractWalletAddress(token);
-    return extractedWallet.equals(walletAddress) && !isTokenExpired(token);
-}
-
-
+    // is token isValidToken
+    public boolean isValidToken(String token, String walletAddress) {
+        final String extractedWallet = extractWalletAddress(token);
+        return extractedWallet.equals(walletAddress) && !isTokenExpired(token);
+    }
 
 
 }
