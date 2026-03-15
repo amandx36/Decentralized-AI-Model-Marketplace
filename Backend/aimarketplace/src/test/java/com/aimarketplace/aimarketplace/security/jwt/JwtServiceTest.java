@@ -16,7 +16,7 @@ public class JwtServiceTest {
     JwtService jwtService ;
 
     @Test
-    void testTokenGeneration() {
+     public void testTokenGeneration() {
 
 
 
@@ -27,4 +27,18 @@ public class JwtServiceTest {
         // check  it return something or not
         assertNotNull(token);
     }
+
+
+    // another test case for validating wallet address extraction
+    public  void testWalletExtraction(){
+        String wallet = "0x02er";
+        // generate token
+        String token = jwtService.generateToken(wallet);
+
+        String extractedWalletAddress  = jwtService.extractWalletAddress(token);
+
+        assertEquals(wallet,extractedWalletAddress);
+
+    }
+
 }
