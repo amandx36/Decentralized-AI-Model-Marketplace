@@ -4,23 +4,15 @@ spring:
 
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      database: ai-MarketPlace
+      uri: mongodb://localhost:27017/aimarketplace
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+  output:
+    ansi:
+      enabled: ALWAYS
 
-# JWT settings
 app:
   jwt:
-    secret: djfdjdfjdfjdjfdkjdkfjsdfiouifiwskdfjksdss96950
+    secret: ${JWT_SECRET}
     expiration-ms: 86000000
     refresh-expiration: 6480000
 
@@ -29,7 +21,7 @@ app:
 
 server:
   port: 8000
+  servlet:
+    context-path: /api
   error:
     include-message: always
-  servlet:
-    context-path : /api
