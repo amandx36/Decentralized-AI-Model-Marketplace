@@ -46,10 +46,19 @@ public class User {
     private  String email;
 
 
+    // for storing nonce
+    @Field("nonce")
+    private  String nonce ;
+
+    @Field("createdAt")
+    private Long Nonce_createdAt;
+
     @Field("password")
     @NotBlank
     @Size(max = 180)
     private  String password ;
+
+
 
 
     @Field("verification_token")
@@ -85,9 +94,6 @@ public class User {
     @Field("wallet_address")
     private String walletAddress ;
 
-    // for storing nonce
-    @Field("nonce")
-    private String nonce ;
 
 
     @Field("owned_model")
