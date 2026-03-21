@@ -18,9 +18,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Document(collection =  "users")
 @Data               // generate getName SetAge etc
@@ -31,19 +28,7 @@ public class User {
     @Id
     private String id ;
 
-    @NotBlank
-    @Size(max = 30)
-    @org.springframework.data.mongodb.core.index.Indexed(unique = true)
-    @Field("username")    // key
-    private  String username;  // value
 
-
-    @NotBlank
-    @Size(max = 50)
-    @org.springframework.data.mongodb.core.index.Indexed(unique = true)
-    @Email
-    @Field("email")
-    private  String email;
 
 
     // for storing nonce
@@ -53,16 +38,12 @@ public class User {
     @Field("createdAt")
     private Long Nonce_createdAt;
 
-    @Field("password")
-    @NotBlank
-    @Size(max = 180)
-    private  String password ;
 
 
 
 
-    @Field("verification_token")
-    private String verificationToken ;
+    @Field("verification_token")   // key
+    private String verificationToken ;   // value
 
     @Field("verification_token_expiry")
     private Instant verificationTokenExpiry;

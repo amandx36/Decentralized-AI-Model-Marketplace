@@ -5,4 +5,5 @@ import com.aimarketplace.aimarketplace.dto.response.LoginResponse;
 
 public interface AuthService {
     LoginResponse verifyLogin( LoginRequest request) ;
+    String generateAndSaveNonce(String walletAddress);
 }

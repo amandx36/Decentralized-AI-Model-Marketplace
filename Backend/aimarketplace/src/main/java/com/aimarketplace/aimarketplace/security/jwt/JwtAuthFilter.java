@@ -60,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (optionalUser.isPresent()) {
 
-                User user = optionalUser.get();
+                User user = optionalUser.orElseThrow(() -> new RuntimeException("User not found with wallet address: " + walletAddress));
 
                 UserPrincipal principal = new UserPrincipal(user);
 

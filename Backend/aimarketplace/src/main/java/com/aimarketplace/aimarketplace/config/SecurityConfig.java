@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-// Marks this class as a Spring Security configuration
+// Marking  this class as a Spring Security configuration
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

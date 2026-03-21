@@ -1,5 +1,39 @@
 Nonce System (Important for Wallet Security)
 
+
+Implementation 
+
+[
+
+    User hits API to generate nonce → backend saves nonce in DB 
+and returns it → frontend sends nonce to MetaMask →
+MetaMask signs the nonce using the user’s private key
+→ signature is sent to backend → backend uses message 
++ signature to recover wallet address → if recovered address 
++ matches provided walletAddress AND nonce matches
++ DB → authentication is successful → JWT is generated
+
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Right now your login is:
 
 walletAddress → generate JWT
@@ -72,6 +106,14 @@ generate JWT
 You can implement this later with Web3j.
 
 For Phase-1 you can mock verification.
+
+
+
+
+
+
+
+
 
 3️⃣ Add CreatedAt and LastLogin Fields
 

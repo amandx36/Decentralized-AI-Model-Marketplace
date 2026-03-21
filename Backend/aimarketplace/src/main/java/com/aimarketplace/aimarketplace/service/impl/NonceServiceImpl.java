@@ -1,19 +1,20 @@
 package com.aimarketplace.aimarketplace.service.impl;
 
+import com.aimarketplace.aimarketplace.entity.User;
 import com.aimarketplace.aimarketplace.service.NonceService;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public class NonceServiceImpl implements NonceService {
 
 
+    @Override
+    public String generateNonce() {
 
+        return "Trying to log into Ai marketplace " + UUID.randomUUID();
 
-
-@Override
-public String generateNonce() {
-    return "Trying to log into Ai marketplace " + UUID.randomUUID();
-}
+    }
 
     @Override
     public boolean isExpired(Long createdAt) {
