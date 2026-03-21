@@ -2,10 +2,14 @@ package com.aimarketplace.aimarketplace.service.impl;
 
 import com.aimarketplace.aimarketplace.entity.User;
 import com.aimarketplace.aimarketplace.service.NonceService;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.UUID;
 
+
+
+@Service
 public class NonceServiceImpl implements NonceService {
 
 

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -21,19 +23,12 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-
-    @PostMapping("/login")
-    public LoginResponse login (@RequestBody LoginRequest request){
-
-        return authService.verifyLogin(request);
-    }
-
     // method for request nonce
 
     @PostMapping("/request-nonce")
     public ResponseEntity<?> requestNonce(@RequestBody NonceRequest request){
         String nonce = authService.generateAndSaveNonce(request.getWalletAddress());
-        return RequestEntity.ok("nonce", nonce);
+        return ResponseEntity.ok(Map.of("nonce", nonce));
     }
     // verify nonce
     @PostMapping("/verify")
@@ -44,6 +39,8 @@ public class AuthController {
                 request.getMessage(),
                 request.getSignature()
         );
+
+        return ResponseEntity.ok(Map.of("token", token));
 
     }
 

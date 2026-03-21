@@ -25,3 +25,8 @@ server:
     context-path: /api
   error:
     include-message: always
+
+
+jwt:
+  secret: myVeryStrongkjdkfjdkfkdfkjdkfjdiuieofSecretKey123456
+  expiration: 86400000

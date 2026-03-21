@@ -20,30 +20,9 @@ public class AuthServiceimpl implements AuthService {
     @Autowired
     private UserRepository userRepository;
 
-
-    // for jwt services
     @Autowired
     private JwtService jwtService;
 
-
-    @Override
-    public LoginResponse verifyLogin(LoginRequest request) {
-        // check is exist in the database other wise create it
-        User user = userRepository.findByWalletAddress(request.getWalletAddress())
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setWalletAddress(request.getWalletAddress());
-                    return userRepository.save(newUser);
-                });
-
-        // generate  the jwt token
-        String token = jwtService.generateToken(request.getWalletAddress());
-        return new LoginResponse(
-                "Login Sucessfully ",
-                token,
-                "200"
-        );
-    }
 
     // function for generating ans saving the nonce
 
@@ -55,13 +34,10 @@ public class AuthServiceimpl implements AuthService {
 
         User user = userRepository.findByWalletAddress(walletAddress)
                 .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setWalletAddress(walletAddress);
-                    newUser.setNonce_createdAt(Instant.now().toEpochMilli());
-                    return userRepository.save(newUser);
-
-                   
-                });
+            User newUser = new User();
+            newUser.setWalletAddress(walletAddress);
+            return userRepository.save(newUser);
+        });
 
         String nonce = nonceService.generateNonce();
 
@@ -79,19 +55,27 @@ public class AuthServiceimpl implements AuthService {
         // fetch user
         User user = userRepository.findByWalletAddress(walletAddress).orElseThrow(()-> new RuntimeException("User Not found "));
 
-        //  1 validate nonce
-        if (!message.equals(user.getNonce())){
-            throw  new RuntimeException("Invalid Nonce ");
 
+
+
+        //  1 validate nonce
+        if (user.getNonce() == null || !message.equals(user.getNonce())) {
+            throw new RuntimeException("Invalid nonce");
         }
-        // 2 recover  wallet address
+
+        // 2 check the expiry of nonce
+        if (System.currentTimeMillis() - user.getNonce_createdAt()> 5 * 60 * 1000) {
+            throw new RuntimeException("Nonce expired");
+        }
+
+        // 3 recover  wallet address
         String recoveredAddress = Web3SignatureUtil.recoverAddress(message, signature);
 
-        // 3 compare address
+        //   4 compare address
         if (!recoveredAddress.equalsIgnoreCase(walletAddress)){
             throw  new RuntimeException("Signature miss match ");
         }
-        // 4 invalidate nonce
+        //  5  invalidate nonce
         user.setNonce(null);
         userRepository.save(user);
 
