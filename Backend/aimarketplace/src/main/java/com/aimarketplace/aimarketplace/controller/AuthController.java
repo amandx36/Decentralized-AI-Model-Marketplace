@@ -3,6 +3,7 @@ package com.aimarketplace.aimarketplace.controller;
 
 import com.aimarketplace.aimarketplace.dto.request.LoginRequest;
 import com.aimarketplace.aimarketplace.dto.request.NonceRequest;
+import com.aimarketplace.aimarketplace.dto.request.VerifyRequest;
 import com.aimarketplace.aimarketplace.dto.response.LoginResponse;
 import com.aimarketplace.aimarketplace.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class LoginController {
+public class AuthController {
 
     @Autowired
     private AuthService authService;
@@ -27,11 +28,23 @@ public class LoginController {
         return authService.verifyLogin(request);
     }
 
-    // method for request noince
+    // method for request nonce
+
     @PostMapping("/request-nonce")
     public ResponseEntity<?> requestNonce(@RequestBody NonceRequest request){
         String nonce = authService.generateAndSaveNonce(request.getWalletAddress());
         return RequestEntity.ok("nonce", nonce);
+    }
+    // verify nonce
+    @PostMapping("/verify")
+    public  ResponseEntity<?> verify(@RequestBody  VerifyRequest request){
+        String token = authService.verifyAndLogin(
+
+                request.getWalletAddress(),
+                request.getMessage(),
+                request.getSignature()
+        );
+
     }
 
 }

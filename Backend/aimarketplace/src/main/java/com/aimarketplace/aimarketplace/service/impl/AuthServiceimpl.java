@@ -5,6 +5,7 @@ import com.aimarketplace.aimarketplace.dto.response.LoginResponse;
 import com.aimarketplace.aimarketplace.entity.User;
 import com.aimarketplace.aimarketplace.repository.UserRepository;
 import com.aimarketplace.aimarketplace.security.jwt.JwtService;
+import com.aimarketplace.aimarketplace.security.jwt.Web3SignatureUtil;
 import com.aimarketplace.aimarketplace.service.AuthService;
 import com.aimarketplace.aimarketplace.service.NonceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,10 @@ public class AuthServiceimpl implements AuthService {
                 .orElseGet(() -> {
                     User newUser = new User();
                     newUser.setWalletAddress(walletAddress);
-                    return newUser;
+                    newUser.setNonce_createdAt(Instant.now().toEpochMilli());
+                    return userRepository.save(newUser);
+
+                   
                 });
 
         String nonce = nonceService.generateNonce();
@@ -66,6 +70,33 @@ public class AuthServiceimpl implements AuthService {
         userRepository.save(user);
 
         return nonce;
+    }
+
+
+    @Override
+    public  String verifyAndLogin(String walletAddress, String message, String signature){
+
+        // fetch user
+        User user = userRepository.findByWalletAddress(walletAddress).orElseThrow(()-> new RuntimeException("User Not found "));
+
+        //  1 validate nonce
+        if (!message.equals(user.getNonce())){
+            throw  new RuntimeException("Invalid Nonce ");
+
+        }
+        // 2 recover  wallet address
+        String recoveredAddress = Web3SignatureUtil.recoverAddress(message, signature);
+
+        // 3 compare address
+        if (!recoveredAddress.equalsIgnoreCase(walletAddress)){
+            throw  new RuntimeException("Signature miss match ");
+        }
+        // 4 invalidate nonce
+        user.setNonce(null);
+        userRepository.save(user);
+
+        // return the jwt token
+        return jwtService.generateToken(walletAddress);
     }
 
 }
