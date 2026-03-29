@@ -39,13 +39,11 @@ public class AuthServiceimpl implements AuthService {
             return userRepository.save(newUser);
         });
 
-        String nonce = nonceService.generateNonce();
 
-        user.setNonce(nonce);
-        user.setNonce_createdAt(Instant.now().toEpochMilli());
-        userRepository.save(user);
 
-        return nonce;
+        // Store nonce in Redis only
+        return nonceService.generateAndSaveNonce(walletAddress);
+
     }
 
 
@@ -58,14 +56,17 @@ public class AuthServiceimpl implements AuthService {
 
 
 
-        //  1 validate nonce
-        if (user.getNonce() == null || !message.equals(user.getNonce())) {
-            throw new RuntimeException("Invalid nonce");
+        //  1 get nonce from  nonce
+        String storedNonce = nonceService.getNonce(walletAddress);
+
+        if (storedNonce== null){
+            throw new RuntimeException("Nonce not  found or expired ");
         }
 
-        // 2 check the expiry of nonce
-        if (System.currentTimeMillis() - user.getNonce_createdAt()> 5 * 60 * 1000) {
-            throw new RuntimeException("Nonce expired");
+        // 2 validate nonce
+        if (!message.equals(storedNonce)){
+            throw new RuntimeException("Invalid nonce ");
+
         }
 
         // 3 recover  wallet address
@@ -75,10 +76,9 @@ public class AuthServiceimpl implements AuthService {
         if (!recoveredAddress.equalsIgnoreCase(walletAddress)){
             throw  new RuntimeException("Signature miss match ");
         }
-        //  5  invalidate nonce
-        user.setNonce(null);
-        userRepository.save(user);
-
+        //  5  delete nonce from redis
+        nonceService.deleteNonce(walletAddress);
+        
         // return the jwt token
         return jwtService.generateToken(walletAddress);
     }

@@ -32,11 +32,8 @@ public class User {
 
 
     // for storing nonce
-    @Field("nonce")
-    private  String nonce ;
+    // now nonce is stored into redish
 
-    @Field("createdAt")
-    private Long Nonce_createdAt;
 
 
 

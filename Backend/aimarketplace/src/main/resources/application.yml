@@ -6,6 +6,11 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/aimarketplace
 
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000ms
+
   output:
     ansi:
       enabled: ALWAYS
@@ -30,3 +35,4 @@ server:
 jwt:
   secret: myVeryStrongkjdkfjdkfkdfkjdkfjdiuieofSecretKey123456
   expiration: 86400000
+
