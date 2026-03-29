@@ -78,7 +78,7 @@ public class AuthServiceimpl implements AuthService {
         }
         //  5  delete nonce from redis
         nonceService.deleteNonce(walletAddress);
-        
+
         // return the jwt token
         return jwtService.generateToken(walletAddress);
     }
