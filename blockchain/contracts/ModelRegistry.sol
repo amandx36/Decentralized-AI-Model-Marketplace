@@ -10,7 +10,7 @@ contract ModelRegistry {
         uint256 _price;
         address owner;
         bool active;
-    }
+    }                         
 
     // 2    Create a counter to generate unique model IDs
     uint256 public modelCount;

@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         )
+
                 // classifying the which request what to do
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/login")).permitAll()
@@ -40,7 +41,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-
+                // check jwt if fail than ask the username and password
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 

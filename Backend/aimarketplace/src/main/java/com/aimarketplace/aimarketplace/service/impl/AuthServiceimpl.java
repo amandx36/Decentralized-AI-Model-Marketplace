@@ -24,7 +24,7 @@ public class AuthServiceimpl implements AuthService {
     private JwtService jwtService;
 
 
-    // function for generating ans saving the nonce
+    // function for generating and  saving the nonce
 
     @Autowired
     private NonceService nonceService;
@@ -52,9 +52,6 @@ public class AuthServiceimpl implements AuthService {
 
         // fetch user
         User user = userRepository.findByWalletAddress(walletAddress).orElseThrow(()-> new RuntimeException("User Not found "));
-
-
-
 
         //  1 get nonce from  nonce
         String storedNonce = nonceService.getNonce(walletAddress);

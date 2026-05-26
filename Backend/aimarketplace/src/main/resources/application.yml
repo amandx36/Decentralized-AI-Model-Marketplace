@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/aimarketplace
+      uri: mongodb://root:root@localhost:27019/aimarketplace?authSource=admin
 
     redis:
       host: localhost

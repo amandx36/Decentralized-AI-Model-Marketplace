@@ -97,7 +97,7 @@ public class User {
 
     }
 
-    // verifying is has the same role as menthion
+    // verifying is  the same role as mention
     public boolean hasRole(ERole roleName) {
 
         for (Role role : roles) {
@@ -110,7 +110,7 @@ public class User {
 
         return false;
     }
-    // increase failure intempt
+    // increase failure attempt
 
     public  void  increaseFailureAttempt(){
         this.failedAttempt++;

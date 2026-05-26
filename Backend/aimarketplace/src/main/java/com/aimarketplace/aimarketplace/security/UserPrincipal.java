@@ -22,7 +22,7 @@ public class UserPrincipal implements UserDetails {
 //    A class that implements UserDetails and wraps
 //    the User entity so Spring Security can use it.
 
-// spring work on userDetaisl so we have to convert user into usesrPrinciple
+// spring work on userDetails  so we have to convert user into userPrinciple
     // so that spring security can use it
 
     // take the user of my database

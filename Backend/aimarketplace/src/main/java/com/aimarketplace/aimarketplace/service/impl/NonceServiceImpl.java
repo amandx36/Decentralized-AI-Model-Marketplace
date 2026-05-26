@@ -34,7 +34,7 @@ public class NonceServiceImpl implements NonceService {
 
 
 
-    // for deletenonce
+    // for deleteNonce
     public void  deleteNonce (String walletAddress){
         String key =   NONCE_PREFIX+walletAddress ;
         redisTemplate.delete(key);
