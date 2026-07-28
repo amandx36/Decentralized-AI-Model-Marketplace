@@ -17,6 +17,12 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.expiration:86400000}")
+    private long expiration;
+
+    @Value("${jwt.refresh-expiration:604800000}")
+    private long refreshExpiration;
+
 
     // for set signing key
     private SecretKey getSigningKey() {
@@ -25,13 +31,21 @@ public class JwtService {
 
 
     // Generate JWT token
-
-
     public String generateToken(String walletAddress) {
         return Jwts.builder()
                 .setSubject(walletAddress)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // Generate refresh token (longer expiration)
+    public String generateRefreshToken(String walletAddress) {
+        return Jwts.builder()
+                .setSubject(walletAddress)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -68,5 +82,13 @@ public class JwtService {
         return extractedWallet.equals(walletAddress) && !isTokenExpired(token);
     }
 
+    // Validate refresh token and generate new access token
+    public String refreshAccessToken(String refreshToken) {
+        if (isTokenExpired(refreshToken)) {
+            throw new RuntimeException("Refresh token has expired");
+        }
+        String walletAddress = extractWalletAddress(refreshToken);
+        return generateToken(walletAddress);
+    }
 
 }

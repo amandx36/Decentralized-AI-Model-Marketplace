@@ -21,13 +21,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 // This filter runs once for every HTTP request
 
 
-    // making custom object for UserPrinciple
     @Autowired
     private UserRepository userRepository;
 
-
+    @Autowired
     private JwtService jwtService;
-    // JwtUtils is used to decode and extract information from the JWT token
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

@@ -17,12 +17,12 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
-    expiration-ms: 86000000
-    refresh-expiration: 6480000
+    secret: ${JWT_SECRET:myVeryStrongkjdkfjdkfkdfkjdkfjdiuieofSecretKey123456}
+    expiration-ms: 86400000
+    refresh-expiration: 604800000
 
   cors:
-    allowed-origin: http://localhost:3000,http://localhost:4200
+    allowed-origin: http://localhost:3000,http://localhost:4200,http://localhost:5173
 
 server:
   port: 8000
@@ -31,8 +31,7 @@ server:
   error:
     include-message: always
 
-
 jwt:
-  secret: myVeryStrongkjdkfjdkfkdfkjdkfjdiuieofSecretKey123456
+  secret: ${JWT_SECRET:myVeryStrongkjdkfjdkfkdfkjdkfjdiuieofSecretKey123456}
   expiration: 86400000
-
+  refresh-expiration: 604800000
