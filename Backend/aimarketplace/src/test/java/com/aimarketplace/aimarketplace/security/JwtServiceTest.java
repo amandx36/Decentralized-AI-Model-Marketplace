@@ -31,6 +31,7 @@ public class JwtServiceTest {
 
 
     // another test case for validating wallet address extraction
+    @Test
     public  void testWalletExtraction(){
         String wallet = "0x02er";
         // generate token

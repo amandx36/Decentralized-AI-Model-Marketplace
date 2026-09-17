@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class UserPrincipal implements UserDetails {
@@ -73,8 +72,10 @@ public class UserPrincipal implements UserDetails {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        for (Role role : user.getRoles()) {
-            authorities.add(() -> role.getName());
+        if (user.getRoles() != null) {
+            for (Role role : user.getRoles()) {
+                authorities.add(() -> role.getName());
+            }
         }
 
         return authorities;

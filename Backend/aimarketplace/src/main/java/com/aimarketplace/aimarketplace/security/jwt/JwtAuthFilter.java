@@ -3,7 +3,9 @@ package com.aimarketplace.aimarketplace.security.jwt;
 import com.aimarketplace.aimarketplace.entity.User;
 import com.aimarketplace.aimarketplace.repository.UserRepository;
 import com.aimarketplace.aimarketplace.security.UserPrincipal;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,9 +30,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain)
             throws ServletException, IOException {
 
         // Get the Authorization header from the incoming HTTP request
@@ -39,44 +41,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Example header sent by frontend:
         // Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-        //  Check if the header exists AND starts with "Bearer "
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7).trim();
 
-            //  Remove "Bearer " (first 7 characters) to extract the JWT token
-            String token = authHeader.substring(7);
+            try {
+                String walletAddress = jwtService.extractWalletAddress(token);
+                Optional<User> optionalUser = userRepository.findByWalletAddress(walletAddress);
 
-            //  Decode the token and extract the wallet address from its payload
-            String walletAddress = jwtService.extractWalletAddress(token);
-
-            //  Create an Authentication object for Spring Security
-            // principal = walletAddress (identity of the user)
-            // credentials = null (JWT already verified)
-            // authorities = null (roles not included here)
-
-
-            Optional<User> optionalUser = userRepository.findByWalletAddress(walletAddress);
-
-            if (optionalUser.isPresent()) {
-
-                User user = optionalUser.orElseThrow(() -> new RuntimeException("User not found with wallet address: " + walletAddress));
-
-                UserPrincipal principal = new UserPrincipal(user);
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                principal,
-                                null,
-                                principal.getAuthorities()
-                        );
-
-                // Store authentication in the Security Context
-                // This tells Spring Security that the user is authenticated
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                if (optionalUser.isPresent()) {
+                    UserPrincipal principal = new UserPrincipal(optionalUser.get());
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    principal,
+                                    null,
+                                    principal.getAuthorities()
+                            );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (JwtException | IllegalArgumentException ignored) {
+                // Invalid tokens stay unauthenticated. Spring Security will reject protected routes.
+                SecurityContextHolder.clearContext();
             }
-
-            //  Continue the request to the next filter or controller
-            chain.doFilter(request, response);
         }
+
+        // Requests without a token must still reach public endpoints.
+        chain.doFilter(request, response);
 
     }
 }

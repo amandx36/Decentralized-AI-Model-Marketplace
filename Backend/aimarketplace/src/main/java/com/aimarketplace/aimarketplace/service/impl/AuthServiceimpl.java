@@ -31,19 +31,24 @@ public class AuthServiceimpl implements AuthService {
 
     @Override
     public String generateAndSaveNonce(String walletAddress) {
-        User user = userRepository.findByWalletAddress(walletAddress)
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setWalletAddress(walletAddress);
-                    newUser.setCreatedAt(Instant.now());
-                    return userRepository.save(newUser);
-                });
+        requireValue(walletAddress, "walletAddress");
+
+        if (userRepository.findByWalletAddress(walletAddress).isEmpty()) {
+            User newUser = new User();
+            newUser.setWalletAddress(walletAddress);
+            newUser.setCreatedAt(Instant.now());
+            userRepository.save(newUser);
+        }
 
         return nonceService.generateAndSaveNonce(walletAddress);
     }
 
     @Override
     public AuthResponse verifyAndLogin(String walletAddress, String message, String signature) {
+        requireValue(walletAddress, "walletAddress");
+        requireValue(message, "message");
+        requireValue(signature, "signature");
+
         User user = userRepository.findByWalletAddress(walletAddress)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -85,6 +90,8 @@ public class AuthServiceimpl implements AuthService {
 
     @Override
     public AuthResponse refreshToken(String refreshToken) {
+        requireValue(refreshToken, "refreshToken");
+
         String walletAddress = jwtService.extractWalletAddress(refreshToken);
         String newAccessToken = jwtService.refreshAccessToken(refreshToken);
 
@@ -103,6 +110,12 @@ public class AuthServiceimpl implements AuthService {
             "Token refreshed successfully",
             expiration / 1000
         );
+    }
+
+    private void requireValue(String value, String fieldName) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " is required");
+        }
     }
 }
 

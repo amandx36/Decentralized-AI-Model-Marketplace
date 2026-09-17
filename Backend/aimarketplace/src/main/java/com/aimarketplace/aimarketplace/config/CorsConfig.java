@@ -32,7 +32,7 @@ public class CorsConfig   {
         // Allow credentials like cookies , authorization heasders
         config.setAllowCredentials(true);
 
-    //      map the cors configuration to specific url
+        //      map the cors configuration to specific url
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**",config);
