@@ -48,36 +48,40 @@ public class AuthServiceimpl implements AuthService {
         requireValue(walletAddress, "walletAddress");
         requireValue(message, "message");
         requireValue(signature, "signature");
+        System.out.println("Verifying login for walletAddress: " + walletAddress + ", message: " + message + ", signature: " + signature);
 
         User user = userRepository.findByWalletAddress(walletAddress)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        System.out.println("User found: " + user);
         String storedNonce = nonceService.getNonce(walletAddress);
+      
         if (storedNonce == null) {
             throw new RuntimeException("Nonce not found or expired");
         }
-
+        System.out.println("Stored nonce: " + storedNonce);
+      
         if (!message.equals(storedNonce)) {
             throw new RuntimeException("Invalid nonce");
         }
-
+        System.out.println("Message matches stored nonce. Proceeding to recover address from signature.");
+     
         String recoveredAddress = Web3SignatureUtil.recoverAddress(message, signature);
         if (!recoveredAddress.equalsIgnoreCase(walletAddress)) {
             throw new RuntimeException("Signature mismatch");
         }
 
         nonceService.deleteNonce(walletAddress);
-
+        System.out.println("Nonce deleted. Generating tokens for walletAddress: " + walletAddress);
         String accessToken = jwtService.generateToken(walletAddress);
         String refreshToken = jwtService.generateRefreshToken(walletAddress);
 
         user.setModifiedAt(Instant.now());
         userRepository.save(user);
-
+        System.out.println("User updated with modifiedAt timestamp. Tokens generated successfully.");  
         String role = user.getRoles() != null && !user.getRoles().isEmpty()
                 ? user.getRoles().iterator().next().getName()
                 : "ROLE_USER";
-
+        System.out.println("User role determined: " + role);
         return new AuthResponse(
             accessToken,
             refreshToken,

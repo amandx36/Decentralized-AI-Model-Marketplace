@@ -1,44 +1,29 @@
 package com.aimarketplace.aimarketplace.security.jwt;
 
-import org.web3j.crypto.Hash;
-import org.web3j.crypto.Sign;
 import org.web3j.crypto.Keys;
+import org.web3j.crypto.Sign;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-//    message → prefix → hash → (r,s,v) → publicKey → address
-
-
-
-
-
-// class for handling ethereum signature and signature verification
+// Utility for Ethereum personal_sign signature verification
 public class Web3SignatureUtil {
 
-    // recover wallet address from signed message (nonce) + signature
-
-    // recover address
+    /**
+     * Recover the Ethereum wallet address that signed the given message
+     * using MetaMask's personal_sign / EIP-191 format.
+     */
     public static String recoverAddress(String message, String signature) {
+
         try {
-
-            // Ethereum adds this prefix before signing (EIP-191 standard)
-            String prefix = "\u0019Ethereum Signed Message:\n" + message.length();
-            String prefixedMessage = prefix + message;
-
-            // hash the message for recovering the public key (keccak256)
-            byte[] msgHash = Hash.sha3(prefixedMessage.getBytes(StandardCharsets.UTF_8));
-
-            // convert the string signature into structured data (r, s, v)
+            // Pass the original message bytes; Web3j applies the EIP-191 prefix.
+            byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
             Sign.SignatureData sigData = signatureStringToData(signature);
+            BigInteger publicKey =
+                    Sign.signedPrefixedMessageToKey(messageBytes, sigData);
 
-            // recover the public key using (hash + signature)
-            BigInteger publicKey = Sign.signedMessageToKey(msgHash, sigData);
-
-            // now fetching the address from public key
-            // internally: keccak256(publicKey) → last 20 bytes
             return "0x" + Keys.getAddress(publicKey);
 
         } catch (Exception e) {
@@ -46,24 +31,41 @@ public class Web3SignatureUtil {
         }
     }
 
-    // converting signature string into r, s, v
+    /**
+     * Convert a hexadecimal Ethereum signature into Web3j SignatureData.
+     *
+     * Signature format:
+     *
+     * r = 32 bytes
+     * s = 32 bytes
+     * v = 1 byte
+     *
+     * Total = 65 bytes
+     */
     private static Sign.SignatureData signatureStringToData(String signature) {
 
-        // convert hex string → byte[]
         byte[] sigBytes = Numeric.hexStringToByteArray(signature);
 
-        // last byte is v (recovery id)
+        if (sigBytes.length != 65) {
+            throw new IllegalArgumentException(
+                    "Invalid Ethereum signature length: "
+                            + sigBytes.length
+                            + " bytes"
+            );
+        }
+
+        // Last byte is recovery ID (v).
         byte v = sigBytes[64];
 
-        // normalize v (MetaMask may return 0/1 instead of 27/28)
+        // MetaMask may return 0/1 instead of 27/28.
         if (v < 27) {
             v += 27;
         }
 
-        // first 32 bytes - > r
+        // First 32 bytes = r
         byte[] r = Arrays.copyOfRange(sigBytes, 0, 32);
 
-        // next 32 bytes -> s
+        // Next 32 bytes = s
         byte[] s = Arrays.copyOfRange(sigBytes, 32, 64);
 
         return new Sign.SignatureData(v, r, s);

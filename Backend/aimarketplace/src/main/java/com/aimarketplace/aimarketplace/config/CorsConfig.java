@@ -19,8 +19,8 @@ public class CorsConfig   {
 
         CorsConfiguration config  = new CorsConfiguration();
 
-        // Allow React frontend to connect
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Allow both Vite dev server and Next.js dev server
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
 
 
         // Allow https methods

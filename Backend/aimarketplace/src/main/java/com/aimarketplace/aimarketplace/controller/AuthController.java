@@ -1,7 +1,6 @@
 package com.aimarketplace.aimarketplace.controller;
 
 
-import com.aimarketplace.aimarketplace.dto.request.LoginRequest;
 import com.aimarketplace.aimarketplace.dto.request.NonceRequest;
 import com.aimarketplace.aimarketplace.dto.request.VerifyRequest;
 import com.aimarketplace.aimarketplace.dto.response.AuthResponse;
@@ -33,6 +32,7 @@ public class AuthController {
 
     @PostMapping("/verify")
     public ResponseEntity<?> verify(@RequestBody VerifyRequest request) {
+        System.out.println("Received verify request: " + request);
         AuthResponse response = authService.verifyAndLogin(
             request.getWalletAddress(),
             request.getMessage(),
@@ -44,6 +44,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
+        System.out.println("Received refresh token request: " + refreshToken);
         if (refreshToken == null || refreshToken.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
                 "error", "refreshToken is required"

@@ -1,0 +1,6 @@
+GetMapping	/test/public	/home/N3xtharVory4x/Workspace/Projects/Decentralized-AI-Model-Marketplace/Backend/aimarketplace/src/main/java/com/aimarketplace/aimarketplace/controller/TestController.java
+GetMapping	/test/private	/home/N3xtharVory4x/Workspace/Projects/Decentralized-AI-Model-Marketplace/Backend/aimarketplace/src/main/java/com/aimarketplace/aimarketplace/controller/TestController.java
+GetMapping	/test/health	/home/N3xtharVory4x/Workspace/Projects/Decentralized-AI-Model-Marketplace/Backend/aimarketplace/src/main/java/com/aimarketplace/aimarketplace/controller/TestController.java
+PostMapping	/auth/request-nonce	/home/N3xtharVory4x/Workspace/Projects/Decentralized-AI-Model-Marketplace/Backend/aimarketplace/src/main/java/com/aimarketplace/aimarketplace/controller/AuthController.java
+PostMapping	/auth/verify	/home/N3xtharVory4x/Workspace/Projects/Decentralized-AI-Model-Marketplace/Backend/aimarketplace/src/main/java/com/aimarketplace/aimarketplace/controller/AuthController.java
+PostMapping	/auth/refresh	/home/N3xtharVory4x/Workspace/Projects/Decentralized-AI-Model-Marketplace/Backend/aimarketplace/src/main/java/com/aimarketplace/aimarketplace/controller/AuthController.java
