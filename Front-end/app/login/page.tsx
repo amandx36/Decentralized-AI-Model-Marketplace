@@ -145,7 +145,7 @@ function LoginPageContent() {
     <main className="min-h-screen bg-[#030303] px-6 text-white sm:px-10 lg:px-12">
       <header className="mx-auto flex max-w-[1440px] items-center justify-between py-7">
         <a href="/" className="font-serif text-[15px] tracking-[-.04em] text-white/90">
-          PRISMATIC
+          AI MARKETPLACE <span className="text-white/40">/ @amandx36</span>
         </a>
         <a
           href="/"
@@ -161,7 +161,7 @@ function LoginPageContent() {
             <WalletCards className="text-white/80" />
           </div>
 
-          <p className="text-xs uppercase tracking-[.18em] text-white/40">Prismatic identity</p>
+          <p className="text-xs uppercase tracking-[.18em] text-white/40">Marketplace identity</p>
           <h1 className="mt-4 font-serif text-5xl leading-[.9] tracking-[-.06em]">
             Enter the
             <br />

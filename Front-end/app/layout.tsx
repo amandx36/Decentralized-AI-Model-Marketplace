@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Prismatic — Clarity Today. Impact Tomorrow.',
-  description: 'Prismatic helps forward-thinking teams turn complexity into clarity.',
+  title: 'AI Model Marketplace — Own. Trade. Run.',
+  description: 'Discover, own, monetize, and run AI models through a decentralized marketplace powered by Ethereum and IPFS.',
   generator: 'v0.app',
   icons: {
     icon: [

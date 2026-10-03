@@ -1,85 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Bell, CalendarDays, ChartNoAxesColumnIncreasing, CheckSquare, ChevronDown, FileText, Home, Menu, MessageSquare, MoreHorizontal, PanelLeft, Search, Settings, SlidersHorizontal, Sparkles, Users, X } from 'lucide-react'
+import { useEffect,useState } from 'react'
+import Link from 'next/link'
+import { ArrowDownLeft, ArrowUpRight, Box, Cpu, ExternalLink, Fingerprint, Orbit, Plus, Wallet } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-/** Read the non-HttpOnly wallet cookie that the BFF sets after successful auth. */
-function readPublicWalletCookie(): string | null {
-  if (typeof document === 'undefined') return null
-  const match = document.cookie.match(/(?:^|;\s*)aimarketplace_wallet_pub=([^;]+)/)
-  return match ? decodeURIComponent(match[1]) : null
-}
-
-/** Abbreviate a wallet address: 0x1234…abcd */
-function shortAddress(addr: string): string {
-  if (addr.length < 10) return addr
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`
-}
-
-const navItems = [
-  { label: 'Dashboard', icon: Home },
-  { label: 'Analytics', icon: ChartNoAxesColumnIncreasing },
-  { label: 'Team', icon: Users },
-  { label: 'Messages', icon: MessageSquare },
-  { label: 'Documents', icon: FileText },
-  { label: 'Calendar', icon: CalendarDays },
-  { label: 'Settings', icon: Settings },
-]
-
-const teammates = [
-  ['Sarah Kim', 'Design', 'SK', 'bg-[#5f7076]'],
-  ['John Doe', 'Engineering', 'JD', 'bg-[#6b8292]'],
-  ['Mike Taylor', 'Engineering', 'MT', 'bg-[#936f52]'],
-  ['Lisa Park', 'Product', 'LP', 'bg-[#8d2630]'],
-  ['Ravi Singh', 'Data', 'RS', 'bg-[#322b2e]'],
-]
-
-const stats = [
-  ['Total projects', '24', '+2 from last month', FileText],
-  ['Active tasks', '127', '+12 from yesterday', CheckSquare],
-  ['Team members', '16', '+1 new member', Users],
-  ['Completion rate', '87%', '+5% from last week', ChartNoAxesColumnIncreasing],
-]
-
-function ThroughputChart() {
-  return <div className="relative mt-8 h-[260px] overflow-hidden rounded-xl bg-[#181818] px-10 pb-8 pt-4">
-    <div className="absolute inset-x-10 top-4 flex h-[190px] flex-col justify-between text-[12px] text-[#8b8b8b]"><div className="border-t border-dashed border-white/[.07]">60</div><div className="border-t border-dashed border-white/[.07]">45</div><div className="border-t border-dashed border-white/[.07]">30</div><div className="border-t border-dashed border-white/[.07]">15</div><div className="border-t border-dashed border-white/[.07]">0</div></div>
-    <svg className="absolute inset-x-10 top-4 h-[190px] w-[calc(100%-5rem)]" viewBox="0 0 700 190" preserveAspectRatio="none" aria-label="Task throughput line chart" role="img"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#dedede" stopOpacity=".18" /><stop offset="1" stopColor="#dedede" stopOpacity="0" /></linearGradient></defs><path d="M0 150 C75 127 105 113 170 101 S250 89 320 72 S410 66 470 58 S575 34 700 16 L700 190 L0 190 Z" fill="url(#area)" /><path d="M0 150 C75 127 105 113 170 101 S250 89 320 72 S410 66 470 58 S575 34 700 16" fill="none" stroke="#f2f2f2" strokeWidth="2" /><path d="M0 137 C45 110 90 91 130 109 S185 170 225 128 S270 57 315 86 S365 119 408 91 S455 20 498 31 S578 63 700 72" fill="none" stroke="#979797" strokeDasharray="4 5" strokeWidth="2" /></svg>
-    <div className="absolute inset-x-10 bottom-2 flex justify-between text-[12px] text-[#8b8b8b]">{['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8'].map((week) => <span key={week}>{week}</span>)}</div>
-  </div>
-}
-
-export default function DashboardPage() {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [wallet, setWallet] = useState<string | null>(null)
-
-  // Read wallet address from non-HttpOnly cookie (set by BFF after successful auth)
-  useEffect(() => {
-    setWallet(readPublicWalletCookie())
-  }, [])
-
-  // Derive initials for the avatar — use wallet prefix when available
-  const displayName = wallet ? shortAddress(wallet) : 'Jordan Diaz'
-  const avatarInitials = wallet
-    ? wallet.slice(2, 4).toUpperCase()
-    : 'JD'
-  return <main className="min-h-screen bg-[#090909] text-[#f4f4f4] font-sans">
-    <div className="mx-auto flex min-h-screen max-w-[1536px] border-x border-white/[.08] bg-[#0b0b0b]">
-      <aside className={`${mobileOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-30 flex w-[265px] flex-col border-r border-white/[.08] bg-[#181818] p-3 transition-transform lg:static lg:translate-x-0`}>
-        <div className="flex items-center justify-between px-3 py-2"><a href="/" className="font-serif text-[16px] font-bold tracking-[-.06em]">PRISMATIC</a><button className="lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Close navigation"><X /></button></div>
-        <div className="mt-3 flex items-center gap-2 rounded-md border border-white/[.06] bg-[#202020] p-2 text-[#c7c7c7]"><Sparkles className="size-4" /><span className="text-xs">Workspace</span><ChevronDown className="ml-auto size-3" /></div>
-        <nav className="mt-4 flex flex-col gap-1">{navItems.map(({ label, icon: Icon }, index) => <a key={label} href={index === 0 ? '/dashboard' : '#'} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[15px] ${index === 0 ? 'bg-[#2a2a2a] text-white' : 'text-[#d0d0d0] hover:bg-white/[.05]'}`}><Icon className="size-[17px]" />{label}</a>)}</nav>
-        <div className="mt-8 px-3 text-[12px] text-[#a0a0a0]">Your team</div>
-        <div className="mt-2 flex flex-col gap-1">{teammates.map(([name, role, initials, color]) => <div key={name} className="flex items-center gap-2 rounded-md px-2 py-1.5"><span className={`flex size-6 items-center justify-center rounded-full text-[9px] font-medium text-white ${color}`}>{initials}</span><span className="text-[14px] text-[#dedede]">{name}</span><span className="ml-auto text-[12px] text-[#a0a0a0]">{role}</span></div>)}</div>
-        <div className="mt-auto flex items-center gap-2 border-t border-white/[.08] px-2 pt-4"><span className="flex size-7 items-center justify-center rounded-full bg-[#d7e0e2] text-[10px] text-[#333]">{avatarInitials}</span><div><div className="text-[14px]">{displayName}</div><div className="text-[12px] text-[#999]">{wallet ?? 'jordan@shadcnstore.com'}</div></div><MoreHorizontal className="ml-auto size-4 text-[#999]" /></div>
-      </aside>
-      {mobileOpen && <button className="fixed inset-0 z-20 bg-black/60 lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Close menu overlay" />}
-      <section className="min-w-0 flex-1">
-        <header className="flex h-[64px] items-center border-b border-white/[.08] px-6 sm:px-8"><button className="mr-5 lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu /></button><PanelLeft className="mr-5 hidden size-4 text-[#d6d6d6] lg:block" /><h1 className="text-[20px] font-semibold">Welcome back, {displayName}</h1><div className="ml-auto flex items-center gap-6 text-[#dfdfdf]"><Search className="size-[18px]" /><Bell className="size-[17px]" /><span className="flex size-8 items-center justify-center rounded-full bg-[#dae3e3] text-[10px] text-[#333]">{avatarInitials}</span></div></header>
-        <div className="px-6 py-6 sm:px-8 sm:py-7"><div className="grid gap-4 sm:grid-cols-2">{stats.map(([label, value, detail, Icon]) => <article key={label as string} className="rounded-2xl border border-white/[.12] bg-[#1a1a1a] p-6"><div className="flex items-start justify-between"><p className="text-[15px]">{label as string}</p><Icon className="size-[19px] text-[#a5a5a5]" /></div><p className="mt-8 text-[24px] font-semibold tracking-[-.04em]">{value as string}</p><p className="mt-1 text-[13px] text-[#999]">{detail as string}</p></article>)}</div>
-          <section className="mt-6 rounded-2xl border border-white/[.12] bg-[#1a1a1a] p-6"><div><h2 className="text-[17px] font-semibold">Task throughput</h2><p className="mt-1 text-[14px] text-[#999]">Tasks opened against tasks completed over the last eight weeks</p></div><ThroughputChart /></section>
-        </div>
-      </section>
-    </div>
-  </main>
-}
+function readWallet(){if(typeof document==='undefined')return null;const match=document.cookie.match(/(?:^|;\s*)aimarketplace_wallet_pub=([^;]+)/);return match?decodeURIComponent(match[1]):null}
+const entries=[['Vision Transformer XL','Uploaded · Inference ready','0.18 ETH','0x71C7…4F2a'],['Semantic Atlas','Purchased · Access verified','0.08 ETH','0x2bF1…C8e3'],['Lumen Speech','Uploaded · IPFS pinned','0.24 ETH','0xA93e…91D0']]
+export default function DashboardPage(){const [wallet,setWallet]=useState<string|null>(null);useEffect(()=>setWallet(readWallet()),[]);return <main className="marketplace-shell min-h-screen"><header className="site-header"><Link href="/" className="brand"><span className="brand-mark"><Orbit size={18}/></span><span><b>AI MARKETPLACE</b><small>/ @amandx36</small></span></Link><nav className="main-nav"><Link href="/explore">Explore</Link><Link href="/upload">Upload</Link><Link href="/dashboard">Dashboard</Link><Link href="/transactions">Transactions</Link><Link href="/#architecture">Documentation</Link></nav><span className="wallet-button flex items-center gap-2 px-3"><span className="live-dot"/>{wallet?`${wallet.slice(0,6)}…${wallet.slice(-4)}`:'Wallet connected'}</span></header><div className="mx-auto max-w-[1320px] px-6 py-10 sm:px-10"><div className="section-kicker">YOUR ON-CHAIN WORKSPACE <span>ACCOUNT / OVERVIEW</span></div><div className="mt-6 flex flex-wrap items-end justify-between gap-5"><div><h1 className="text-4xl font-medium tracking-[-.06em] sm:text-5xl">Marketplace Dashboard</h1><p className="mt-3 font-mono text-[11px] text-white/45">{wallet??'Wallet address unavailable'}</p></div><Link href="/upload"><Button className="button-primary"><Plus size={16}/> Quick Upload</Button></Link></div><div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[['ETH Balance','—','Connected wallet',Wallet],['Uploaded Models','02','Published by you',Box],['Purchased Models','01','Access verified',Cpu],['Earnings','— ETH','Settled on Ethereum',ArrowDownLeft]].map(([label,value,sub,Icon])=><article className="border border-white/10 bg-white/[.025] p-5" key={label as string}><div className="flex items-center justify-between text-xs text-white/50"><span>{label as string}</span><Icon className="size-4 text-cyan-100/70"/></div><strong className="mt-7 block text-2xl font-medium tracking-tight">{value as string}</strong><span className="mt-1 block text-[10px] text-white/35">{sub as string}</span></article>)}</div><div className="mt-8 grid gap-4 lg:grid-cols-[1.5fr_.8fr]"><section className="border border-white/10 bg-[#0c1012]"><div className="flex items-center justify-between border-b border-white/10 px-5 py-4"><div><h2 className="text-sm font-medium">Your models</h2><p className="mt-1 text-[10px] text-white/40">Ownership, access and inference readiness</p></div><Link href="/explore" className="text-[10px] text-cyan-100">Browse models <ArrowUpRight className="ml-1 inline size-3"/></Link></div><div>{entries.map(([name,status,price,creator],i)=><div key={name} className="flex items-center gap-3 border-b border-white/[.07] px-5 py-4 last:border-0"><div className="grid size-9 place-items-center border border-cyan-200/15 bg-cyan-200/[.04] text-cyan-100">{i===1?<Cpu size={16}/>:<Box size={16}/>}</div><div className="min-w-0 flex-1"><b className="block truncate text-xs font-medium">{name}</b><span className="mt-1 block text-[9px] text-white/40">{status}</span></div><span className="hidden font-mono text-[9px] text-white/40 sm:block">{creator}</span><strong className="font-mono text-[10px] font-normal text-amber-100">{price}</strong><Link href="/models/vision-transformer-xl" aria-label={`View ${name}`}><ExternalLink size={14} className="text-white/40"/></Link></div>)}</div></section><section className="border border-white/10 bg-[#0c1012] p-5"><div className="flex items-center gap-2"><Fingerprint size={16} className="text-amber-200"/><h2 className="text-sm font-medium">Wallet identity</h2></div><p className="mt-4 break-all font-mono text-[10px] leading-5 text-white/55">{wallet??'Connect your wallet to view identity'}</p><div className="mt-5 border-t border-white/10 pt-4"><div className="flex items-center justify-between text-[10px]"><span className="text-white/45">Authentication</span><span className="text-emerald-200">Signed message verified</span></div><div className="mt-3 flex items-center justify-between text-[10px]"><span className="text-white/45">Network</span><span className="text-white/70">Ethereum</span></div></div><Link href="/transactions" className="mt-5 flex items-center justify-between border-t border-white/10 pt-4 text-[10px] text-cyan-100">Recent transactions <ArrowUpRight size={13}/></Link></section></div><section className="mt-4 border border-white/10 bg-[#0c1012] p-5"><div className="flex items-center justify-between"><div><h2 className="text-sm font-medium">Recent transactions</h2><p className="mt-1 text-[10px] text-white/40">Purchases and model registrations</p></div><Link href="/transactions" className="text-[10px] text-white/55">View all <ArrowUpRight className="ml-1 inline size-3"/></Link></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><div className="flex items-center gap-3 border border-white/[.07] p-3"><ArrowUpRight size={15} className="text-amber-100"/><span className="flex-1 text-[10px]">Model access purchased</span><b className="font-mono text-[10px] font-normal">0.08 ETH</b></div><div className="flex items-center gap-3 border border-white/[.07] p-3"><ArrowDownLeft size={15} className="text-cyan-100"/><span className="flex-1 text-[10px]">Model registered on-chain</span><b className="font-mono text-[10px] font-normal">Confirmed</b></div></div></section></div></main>}
