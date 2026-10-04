@@ -5,25 +5,142 @@ import Link from 'next/link'
 import { ArrowUpRight, Search, SlidersHorizontal, Orbit, Cpu, Database, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import './page.css'
 
-const models = [
-  ['Vision Transformer XL','Computer Vision','High-resolution image classification with verifiable inference.','0x71C7…4F2a','0.18','ONNX'],
-  ['Lumen Speech','Audio · Speech','Expressive, low-latency speech synthesis for production workflows.','0xA93e…91D0','0.24','PyTorch'],
-  ['Semantic Atlas','Language · Embeddings','Compact multilingual embeddings for semantic search and retrieval.','0x2bF1…C8e3','0.08','Safetensors'],
-  ['Delta Forecast','Time Series','Demand forecasting model with a transparent evaluation card.','0x920a…88bC','0.12','ONNX'],
-  ['CodeLoom 7B','Developer Tools','A fine-tuned code completion model for local inference.','0x9d11…21ef','0.31','GGUF'],
-  ['Latent Studio','Image Generation','A tuned diffusion model for consistent editorial illustration.','0x451f…eA79','0.16','Safetensors'],
+type ModelListing = [string, string, string, string, string, string]
+
+const models: ModelListing[] = [
+  ['Vision Transformer XL', 'Computer Vision', 'High-resolution image classification with verifiable inference.', '0x71C7…4F2a', '0.18', 'ONNX'],
+  ['Lumen Speech', 'Audio · Speech', 'Expressive, low-latency speech synthesis for production workflows.', '0xA93e…91D0', '0.24', 'PyTorch'],
+  ['Semantic Atlas', 'Language · Embeddings', 'Compact multilingual embeddings for semantic search and retrieval.', '0x2bF1…C8e3', '0.08', 'Safetensors'],
+  ['Delta Forecast', 'Time Series', 'Demand forecasting model with a transparent evaluation card.', '0x920a…88bC', '0.12', 'ONNX'],
+  ['CodeLoom 7B', 'Developer Tools', 'A fine-tuned code completion model for local inference.', '0x9d11…21ef', '0.31', 'GGUF'],
+  ['Latent Studio', 'Image Generation', 'A tuned diffusion model for consistent editorial illustration.', '0x451f…eA79', '0.16', 'Safetensors'],
 ]
-export default function ExplorePage(){
-  const [query,setQuery]=useState('')
-  const [category,setCategory]=useState('All categories')
-  const [sort,setSort]=useState('Featured')
-  const categories=useMemo(()=>['All categories',...Array.from(new Set(models.map(m=>m[1])))],[ ])
-  const filtered=useMemo(()=>{
-    const results=models.filter((m)=>m.join(' ').toLowerCase().includes(query.trim().toLowerCase())&&(category==='All categories'||m[1]===category))
-    if(sort==='Price: low to high')results.sort((a,b)=>Number(a[4])-Number(b[4]))
-    if(sort==='Name: A to Z')results.sort((a,b)=>a[0].localeCompare(b[0]))
+
+export default function ExplorePage() {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All categories')
+  const [sort, setSort] = useState('Featured')
+
+  const categories = useMemo(
+    () => ['All categories', ...Array.from(new Set(models.map((model) => model[1])))],
+    [],
+  )
+  const filtered = useMemo(() => {
+    const results = models.filter(
+      (model) =>
+        model.join(' ').toLowerCase().includes(query.trim().toLowerCase()) &&
+        (category === 'All categories' || model[1] === category),
+    )
+    if (sort === 'Price: low to high') results.sort((a, b) => Number(a[4]) - Number(b[4]))
+    if (sort === 'Name: A to Z') results.sort((a, b) => a[0].localeCompare(b[0]))
     return results
-  },[query,category,sort])
-  return <main className="marketplace-shell min-h-screen"><header className="site-header"><Link href="/" className="brand"><span className="brand-mark"><Orbit size={18}/></span><span><b>AI MARKETPLACE</b><small>/ @amandx36</small></span></Link><nav className="main-nav"><Link href="/explore">Explore</Link><Link href="/upload">Upload</Link><Link href="/dashboard">Dashboard</Link><Link href="/transactions">Transactions</Link><Link href="/#architecture">Documentation</Link></nav><Link href="/login"><Button className="wallet-button">Connect Wallet</Button></Link></header><div className="mx-auto max-w-[1320px] px-6 py-14 sm:px-10"><div className="section-kicker">OPEN MODEL EXCHANGE <span>ETHEREUM · IPFS</span></div><div className="mt-7 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><h1 className="text-5xl font-medium tracking-[-.07em] sm:text-7xl">Discover AI Models</h1><p className="mt-4 max-w-lg text-sm leading-7 text-white/50">Inspect model details, verify creator ownership and IPFS availability, then purchase access using ETH.</p></div><span className="font-mono text-[10px] tracking-widest text-white/35">{filtered.length.toString().padStart(2,'0')} OF {models.length.toString().padStart(2,'0')} MODELS</span></div><div className="mt-10 flex flex-col gap-3 border-y border-white/10 py-4 sm:flex-row"><div className="relative flex-1"><Search className="absolute left-4 top-3.5 size-4 text-white/30"/><Input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search models, categories, creator wallets…" aria-label="Search models" className="h-11 border-white/10 bg-white/[.035] pl-11 text-white placeholder:text-white/25"/></div><label className="relative flex h-11 items-center gap-2 border border-white/10 bg-white/[.035] px-3 text-white/55"><SlidersHorizontal className="size-4 shrink-0"/><select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Filter by category" className="h-full min-w-36 flex-1 appearance-none bg-transparent pr-2 text-xs text-white outline-none">{categories.map(item=><option className="bg-[#0c1012]" key={item}>{item}</option>)}</select></label><select value={sort} onChange={e=>setSort(e.target.value)} aria-label="Sort models" className="h-11 border border-white/10 bg-[#0c1012] px-3 text-xs text-white/70 outline-none"><option>Featured</option><option>Price: low to high</option><option>Name: A to Z</option></select></div>{(query||category!=='All categories'||sort!=='Featured')&&<div className="mt-3 flex items-center justify-between text-[10px] text-white/40"><span>Showing {filtered.length} matching models</span><button onClick={()=>{setQuery('');setCategory('All categories');setSort('Featured')}} className="flex items-center gap-1.5 transition hover:text-white"><X size={12}/> Clear filters</button></div>}<div className="mt-7 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{filtered.map(([name,modelCategory,desc,wallet,price,format],i)=><article key={name} className="catalog-card overflow-hidden border border-white/10 bg-[#0c1012]"><div className="relative grid h-40 place-items-center border-b border-white/10 bg-[radial-gradient(circle_at_50%_50%,rgba(56,173,189,.17),transparent_42%),linear-gradient(135deg,#11191c,#090c0e)]"><div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] [background-size:30px_30px]"/><div className="relative flex size-14 items-center justify-center rounded-2xl border border-cyan-200/20 bg-black/50 text-cyan-100 shadow-[0_0_32px_rgba(42,170,190,.14)]">{i%3===0?<Cpu/>:i%3===1?<Database/>:<Orbit/>}</div><span className="absolute bottom-3 left-3 flex items-center gap-2 border border-white/10 bg-black/50 px-2 py-1 font-mono text-[8px] tracking-widest text-white/60"><i className="size-1.5 rounded-full bg-emerald-300"/> IPFS PINNED</span><span className="absolute bottom-3 right-3 flex items-center gap-2 font-mono text-[8px] tracking-widest text-emerald-200"><i className="size-1.5 rounded-full bg-emerald-300"/> ON-CHAIN</span></div><div className="p-5"><span className="rounded-full border border-cyan-200/20 bg-cyan-200/[.04] px-2.5 py-1 text-[9px] text-cyan-100/80">{modelCategory}</span><h2 className="mt-4 text-xl font-medium tracking-tight">{name}</h2><p className="mt-2 min-h-10 text-xs leading-5 text-white/45">{desc}</p><div className="mt-4 grid grid-cols-2 gap-2 border-y border-white/10 py-3 font-mono text-[8px] text-white/35"><span>CREATOR <b className="mt-1 block text-[10px] font-normal text-white/75">{wallet}</b></span><span>FORMAT <b className="mt-1 block text-[10px] font-normal text-white/75">{format}</b></span></div><div className="mt-4 flex items-center justify-between"><div><small className="block font-mono text-[8px] tracking-widest text-white/35">ACCESS PRICE</small><strong className="mt-1 block font-mono text-base">{price} <i className="text-xs not-italic text-amber-200">ETH</i></strong></div><Link href={`/models/${name.toLowerCase().replaceAll(' ','-')}`} className="flex items-center gap-1.5 text-[10px] text-cyan-100">View model <ArrowUpRight size={14}/></Link></div></div></article>)}</div>{filtered.length===0&&<div className="py-20 text-center"><p className="text-sm text-white/60">No models match those filters.</p><button onClick={()=>{setQuery('');setCategory('All categories');setSort('Featured')}} className="mt-3 text-xs text-cyan-100 hover:underline">Clear filters</button></div>}</div></main>
+  }, [query, category, sort])
+
+  function clearFilters() {
+    setQuery('')
+    setCategory('All categories')
+    setSort('Featured')
+  }
+
+  return (
+    <main className="marketplace-shell explore-page">
+      <header className="site-header">
+        <Link href="/" className="brand">
+          <span className="brand-mark"><Orbit size={18} /></span>
+          <span><b>AI MARKETPLACE</b><small>/ @amandx36</small></span>
+        </Link>
+        <nav className="main-nav">
+          <Link href="/explore">Explore</Link>
+          <Link href="/upload">Upload</Link>
+          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/transactions">Transactions</Link>
+          <Link href="/#architecture">Documentation</Link>
+        </nav>
+        <Link href="/login"><Button className="wallet-button">Connect Wallet</Button></Link>
+      </header>
+
+      <div className="explore-container">
+        <div className="section-kicker">OPEN MODEL EXCHANGE <span>ETHEREUM · IPFS</span></div>
+        <div className="explore-heading">
+          <div>
+            <h1>Discover AI Models</h1>
+            <p>Inspect model details, verify creator ownership and IPFS availability, then purchase access using ETH.</p>
+          </div>
+          <span className="explore-count">
+            {filtered.length.toString().padStart(2, '0')} OF {models.length.toString().padStart(2, '0')} MODELS
+          </span>
+        </div>
+
+        <div className="explore-filters">
+          <div className="explore-search">
+            <Search aria-hidden="true" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search models, categories, creator wallets…"
+              aria-label="Search models"
+            />
+          </div>
+          <label className="explore-category-filter">
+            <SlidersHorizontal aria-hidden="true" />
+            <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Filter by category">
+              {categories.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <select className="explore-sort" value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort models">
+            <option>Featured</option>
+            <option>Price: low to high</option>
+            <option>Name: A to Z</option>
+          </select>
+        </div>
+
+        {(query || category !== 'All categories' || sort !== 'Featured') && (
+          <div className="explore-active-filters">
+            <span>Showing {filtered.length} matching models</span>
+            <button onClick={clearFilters}><X aria-hidden="true" /> Clear filters</button>
+          </div>
+        )}
+
+        <div className="explore-grid">
+          {filtered.map(([name, modelCategory, description, wallet, price, format], index) => {
+            const ModelIcon = index % 3 === 0 ? Cpu : index % 3 === 1 ? Database : Orbit
+            return (
+              <article className="catalog-card" key={name}>
+                <div className="catalog-art">
+                  <div className="catalog-art-grid" />
+                  <div className="catalog-model-icon"><ModelIcon aria-hidden="true" /></div>
+                  <span className="catalog-status catalog-ipfs"><i /> IPFS PINNED</span>
+                  <span className="catalog-status catalog-chain"><i /> ON-CHAIN</span>
+                </div>
+                <div className="catalog-body">
+                  <span className="catalog-category">{modelCategory}</span>
+                  <h2>{name}</h2>
+                  <p>{description}</p>
+                  <div className="catalog-meta">
+                    <span>CREATOR <b>{wallet}</b></span>
+                    <span>FORMAT <b>{format}</b></span>
+                  </div>
+                  <div className="catalog-footer">
+                    <div><small>ACCESS PRICE</small><strong>{price} <i>ETH</i></strong></div>
+                    <Link href={`/models/${name.toLowerCase().replaceAll(' ', '-')}`}>
+                      View model <ArrowUpRight aria-hidden="true" />
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="explore-empty">
+            <p>No models match those filters.</p>
+            <button onClick={clearFilters}>Clear filters</button>
+          </div>
+        )}
+      </div>
+    </main>
+  )
 }

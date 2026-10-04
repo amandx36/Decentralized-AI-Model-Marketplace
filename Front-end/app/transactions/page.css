@@ -1,0 +1,127 @@
+.transactions-page {
+  min-height: 100vh;
+}
+
+.transactions-container {
+  width: min(100% - 48px, 1200px);
+  margin: 0 auto;
+  padding: 56px 0 72px;
+}
+
+.transactions-container h1 {
+  margin: 28px 0 0;
+  font-size: clamp(42px, 5vw, 56px);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+}
+
+.transactions-description {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: rgb(255 255 255 / 48%);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.transactions-table-wrap {
+  margin-top: 36px;
+  overflow-x: auto;
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: #0c1012;
+}
+
+.transactions-table {
+  display: grid;
+  min-width: 720px;
+  grid-template-columns: 1.5fr 1.2fr 0.7fr 0.8fr 0.7fr;
+  align-items: center;
+}
+
+.transactions-table-head {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  color: rgb(255 255 255 / 38%);
+  font: 8px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.14em;
+}
+
+.transactions-table-row {
+  min-height: 58px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgb(255 255 255 / 7%);
+  font-size: 10px;
+}
+
+.transactions-table-row:last-child {
+  border-bottom: 0;
+}
+
+.transactions-table-row > span {
+  min-width: 0;
+  padding-right: 12px;
+}
+
+.transaction-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.transaction-action svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.transaction-incoming {
+  color: #a7f3d0;
+}
+
+.transaction-outgoing {
+  color: #fef3c7;
+}
+
+.transaction-model {
+  color: rgb(255 255 255 / 65%);
+}
+
+.transaction-value,
+.transaction-hash {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.transaction-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a7f3d0;
+}
+
+.transaction-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6ee7b7;
+}
+
+.transaction-hash {
+  color: rgb(207 250 254 / 70%);
+  white-space: nowrap;
+}
+
+.transactions-note {
+  margin: 16px 0 0;
+  color: rgb(255 255 255 / 32%);
+  font-size: 10px;
+}
+
+@media (max-width: 640px) {
+  .transactions-container {
+    width: min(100% - 36px, 1200px);
+    padding-top: 42px;
+  }
+
+  .transactions-description {
+    font-size: 13px;
+  }
+}

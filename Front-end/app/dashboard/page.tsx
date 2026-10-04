@@ -1,10 +1,152 @@
 'use client'
 
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowDownLeft, ArrowUpRight, Box, Cpu, ExternalLink, Fingerprint, Orbit, Plus, Wallet } from 'lucide-react'
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Box,
+  Cpu,
+  ExternalLink,
+  Fingerprint,
+  Orbit,
+  Plus,
+  Wallet,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import './page.css'
 
-function readWallet(){if(typeof document==='undefined')return null;const match=document.cookie.match(/(?:^|;\s*)aimarketplace_wallet_pub=([^;]+)/);return match?decodeURIComponent(match[1]):null}
-const entries=[['Vision Transformer XL','Uploaded · Inference ready','0.18 ETH','0x71C7…4F2a'],['Semantic Atlas','Purchased · Access verified','0.08 ETH','0x2bF1…C8e3'],['Lumen Speech','Uploaded · IPFS pinned','0.24 ETH','0xA93e…91D0']]
-export default function DashboardPage(){const [wallet,setWallet]=useState<string|null>(null);useEffect(()=>setWallet(readWallet()),[]);return <main className="marketplace-shell min-h-screen"><header className="site-header"><Link href="/" className="brand"><span className="brand-mark"><Orbit size={18}/></span><span><b>AI MARKETPLACE</b><small>/ @amandx36</small></span></Link><nav className="main-nav"><Link href="/explore">Explore</Link><Link href="/upload">Upload</Link><Link href="/dashboard">Dashboard</Link><Link href="/transactions">Transactions</Link><Link href="/#architecture">Documentation</Link></nav><span className="wallet-button flex items-center gap-2 px-3"><span className="live-dot"/>{wallet?`${wallet.slice(0,6)}…${wallet.slice(-4)}`:'Wallet connected'}</span></header><div className="mx-auto max-w-[1320px] px-6 py-10 sm:px-10"><div className="section-kicker">YOUR ON-CHAIN WORKSPACE <span>ACCOUNT / OVERVIEW</span></div><div className="mt-6 flex flex-wrap items-end justify-between gap-5"><div><h1 className="text-4xl font-medium tracking-[-.06em] sm:text-5xl">Marketplace Dashboard</h1><p className="mt-3 font-mono text-[11px] text-white/45">{wallet??'Wallet address unavailable'}</p></div><Link href="/upload"><Button className="button-primary"><Plus size={16}/> Quick Upload</Button></Link></div><div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[['ETH Balance','—','Connected wallet',Wallet],['Uploaded Models','02','Published by you',Box],['Purchased Models','01','Access verified',Cpu],['Earnings','— ETH','Settled on Ethereum',ArrowDownLeft]].map(([label,value,sub,Icon])=><article className="border border-white/10 bg-white/[.025] p-5" key={label as string}><div className="flex items-center justify-between text-xs text-white/50"><span>{label as string}</span><Icon className="size-4 text-cyan-100/70"/></div><strong className="mt-7 block text-2xl font-medium tracking-tight">{value as string}</strong><span className="mt-1 block text-[10px] text-white/35">{sub as string}</span></article>)}</div><div className="mt-8 grid gap-4 lg:grid-cols-[1.5fr_.8fr]"><section className="border border-white/10 bg-[#0c1012]"><div className="flex items-center justify-between border-b border-white/10 px-5 py-4"><div><h2 className="text-sm font-medium">Your models</h2><p className="mt-1 text-[10px] text-white/40">Ownership, access and inference readiness</p></div><Link href="/explore" className="text-[10px] text-cyan-100">Browse models <ArrowUpRight className="ml-1 inline size-3"/></Link></div><div>{entries.map(([name,status,price,creator],i)=><div key={name} className="flex items-center gap-3 border-b border-white/[.07] px-5 py-4 last:border-0"><div className="grid size-9 place-items-center border border-cyan-200/15 bg-cyan-200/[.04] text-cyan-100">{i===1?<Cpu size={16}/>:<Box size={16}/>}</div><div className="min-w-0 flex-1"><b className="block truncate text-xs font-medium">{name}</b><span className="mt-1 block text-[9px] text-white/40">{status}</span></div><span className="hidden font-mono text-[9px] text-white/40 sm:block">{creator}</span><strong className="font-mono text-[10px] font-normal text-amber-100">{price}</strong><Link href="/models/vision-transformer-xl" aria-label={`View ${name}`}><ExternalLink size={14} className="text-white/40"/></Link></div>)}</div></section><section className="border border-white/10 bg-[#0c1012] p-5"><div className="flex items-center gap-2"><Fingerprint size={16} className="text-amber-200"/><h2 className="text-sm font-medium">Wallet identity</h2></div><p className="mt-4 break-all font-mono text-[10px] leading-5 text-white/55">{wallet??'Connect your wallet to view identity'}</p><div className="mt-5 border-t border-white/10 pt-4"><div className="flex items-center justify-between text-[10px]"><span className="text-white/45">Authentication</span><span className="text-emerald-200">Signed message verified</span></div><div className="mt-3 flex items-center justify-between text-[10px]"><span className="text-white/45">Network</span><span className="text-white/70">Ethereum</span></div></div><Link href="/transactions" className="mt-5 flex items-center justify-between border-t border-white/10 pt-4 text-[10px] text-cyan-100">Recent transactions <ArrowUpRight size={13}/></Link></section></div><section className="mt-4 border border-white/10 bg-[#0c1012] p-5"><div className="flex items-center justify-between"><div><h2 className="text-sm font-medium">Recent transactions</h2><p className="mt-1 text-[10px] text-white/40">Purchases and model registrations</p></div><Link href="/transactions" className="text-[10px] text-white/55">View all <ArrowUpRight className="ml-1 inline size-3"/></Link></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><div className="flex items-center gap-3 border border-white/[.07] p-3"><ArrowUpRight size={15} className="text-amber-100"/><span className="flex-1 text-[10px]">Model access purchased</span><b className="font-mono text-[10px] font-normal">0.08 ETH</b></div><div className="flex items-center gap-3 border border-white/[.07] p-3"><ArrowDownLeft size={15} className="text-cyan-100"/><span className="flex-1 text-[10px]">Model registered on-chain</span><b className="font-mono text-[10px] font-normal">Confirmed</b></div></div></section></div></main>}
+function readWallet() {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(/(?:^|;\s*)aimarketplace_wallet_pub=([^;]+)/)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+const entries = [
+  ['Vision Transformer XL', 'Uploaded · Inference ready', '0.18 ETH', '0x71C7…4F2a'],
+  ['Semantic Atlas', 'Purchased · Access verified', '0.08 ETH', '0x2bF1…C8e3'],
+  ['Lumen Speech', 'Uploaded · IPFS pinned', '0.24 ETH', '0xA93e…91D0'],
+]
+
+const stats = [
+  { label: 'ETH Balance', value: '—', sub: 'Connected wallet', Icon: Wallet },
+  { label: 'Uploaded Models', value: '02', sub: 'Published by you', Icon: Box },
+  { label: 'Purchased Models', value: '01', sub: 'Access verified', Icon: Cpu },
+  { label: 'Earnings', value: '— ETH', sub: 'Settled on Ethereum', Icon: ArrowDownLeft },
+]
+
+export default function DashboardPage() {
+  const [wallet, setWallet] = useState<string | null>(null)
+
+  useEffect(() => setWallet(readWallet()), [])
+
+  return (
+    <main className="marketplace-shell dashboard-page">
+      <header className="site-header">
+        <Link href="/" className="brand">
+          <span className="brand-mark"><Orbit size={18} /></span>
+          <span><b>AI MARKETPLACE</b><small>/ @amandx36</small></span>
+        </Link>
+        <nav className="main-nav">
+          <Link href="/explore">Explore</Link>
+          <Link href="/upload">Upload</Link>
+          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/transactions">Transactions</Link>
+          <Link href="/#architecture">Documentation</Link>
+        </nav>
+        <span className="wallet-button dashboard-wallet">
+          <span className="live-dot" />
+          {wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : 'Wallet connected'}
+        </span>
+      </header>
+
+      <div className="dashboard-container">
+        <div className="section-kicker">YOUR ON-CHAIN WORKSPACE <span>ACCOUNT / OVERVIEW</span></div>
+
+        <div className="dashboard-titlebar">
+          <div>
+            <h1>Marketplace Dashboard</h1>
+            <p>{wallet ?? 'Wallet address unavailable'}</p>
+          </div>
+          <Link href="/upload">
+            <Button className="button-primary"><Plus size={16} /> Quick Upload</Button>
+          </Link>
+        </div>
+
+        <div className="dashboard-stats">
+          {stats.map(({ label, value, sub, Icon }) => (
+            <article className="dashboard-stat" key={label}>
+              <div className="dashboard-stat-heading">
+                <span>{label}</span>
+                <Icon aria-hidden="true" />
+              </div>
+              <strong>{value}</strong>
+              <span className="dashboard-stat-subtitle">{sub}</span>
+            </article>
+          ))}
+        </div>
+
+        <div className="dashboard-panels">
+          <section className="dashboard-panel">
+            <div className="dashboard-panel-heading">
+              <div>
+                <h2>Your models</h2>
+                <p>Ownership, access and inference readiness</p>
+              </div>
+              <Link href="/explore">Browse models <ArrowUpRight aria-hidden="true" /></Link>
+            </div>
+            <div>
+              {entries.map(([name, status, price, creator], index) => (
+                <div className="dashboard-model-row" key={name}>
+                  <div className="dashboard-model-icon">
+                    {index === 1 ? <Cpu size={16} /> : <Box size={16} />}
+                  </div>
+                  <div className="dashboard-model-copy">
+                    <b>{name}</b>
+                    <span>{status}</span>
+                  </div>
+                  <span className="dashboard-model-creator">{creator}</span>
+                  <strong className="dashboard-model-price">{price}</strong>
+                  <Link href="/models/vision-transformer-xl" aria-label={`View ${name}`}>
+                    <ExternalLink aria-hidden="true" />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="dashboard-panel dashboard-identity">
+            <div className="dashboard-identity-heading">
+              <Fingerprint aria-hidden="true" />
+              <h2>Wallet identity</h2>
+            </div>
+            <p className="dashboard-address">
+              {wallet ?? 'Connect your wallet to view identity'}
+            </p>
+            <div className="dashboard-identity-details">
+              <div><span>Authentication</span><span className="verified-text">Signed message verified</span></div>
+              <div><span>Network</span><span>Ethereum</span></div>
+            </div>
+            <Link href="/transactions" className="dashboard-transactions-link">
+              Recent transactions <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </section>
+        </div>
+
+        <section className="dashboard-panel dashboard-recent">
+          <div className="dashboard-panel-heading">
+            <div>
+              <h2>Recent transactions</h2>
+              <p>Purchases and model registrations</p>
+            </div>
+            <Link href="/transactions">View all <ArrowUpRight aria-hidden="true" /></Link>
+          </div>
+          <div className="dashboard-activity-grid">
+            <div><ArrowUpRight aria-hidden="true" /><span>Model access purchased</span><b>0.08 ETH</b></div>
+            <div><ArrowDownLeft aria-hidden="true" /><span>Model registered on-chain</span><b>Confirmed</b></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
