@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { COOKIE_TOKEN } from '@/lib/auth'
 
 // Routes that require a valid session
-const PROTECTED = ['/dashboard', '/upload']
+const PROTECTED = ['/dashboard']    // bypassing the /upload so that i can develop it '/upload']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
