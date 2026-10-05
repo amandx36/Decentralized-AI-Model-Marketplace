@@ -1,8 +1,146 @@
 'use client'
 
-import { ArrowUpRight, Search, SlidersHorizontal } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import Link from 'next/link'
+import { ArrowUpRight, Search, SlidersHorizontal, Orbit, Cpu, Database, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import './page.css'
 
-const models = [['Vision Transformer XL','Computer Vision','0.18 ETH','98.4% accuracy'],['AudioBloom v2','Audio Generation','0.24 ETH','12.8k runs'],['Semantic Search Pro','Language','0.32 ETH','99.1% relevance'],['StyleGAN Studio','Image Generation','0.11 ETH','4.2k owners'],['Forecast / Delta','Time Series','0.09 ETH','93.7% accuracy'],['CodePilot Atlas','Developer Tools','0.26 ETH','7.1k runs']]
-export default function ExplorePage(){return <main className="min-h-screen bg-[#030303] text-white"><header className="border-b border-white/10 px-6 py-6 sm:px-10 lg:px-14"><div className="mx-auto flex max-w-[1440px] items-center justify-between"><a href="/" className="font-serif text-sm">PRISMATIC</a><nav className="hidden gap-8 text-[11px] uppercase tracking-[.12em] text-white/45 md:flex"><a href="/explore" className="text-white">Explore</a><a href="/dashboard" className="hover:text-white">Dashboard</a><a href="/upload" className="hover:text-white">Upload model</a></nav><Button className="rounded-full bg-white px-5 text-xs text-black">Connect wallet</Button></div></header><div className="mx-auto max-w-[1440px] px-6 py-12 sm:px-10 lg:px-14"><p className="text-xs uppercase tracking-[.18em] text-cyan-300/70">The open model layer</p><div className="mt-4 flex flex-col justify-between gap-8 lg:flex-row lg:items-end"><h1 className="font-serif text-6xl tracking-[-.07em] sm:text-8xl">Explore models</h1><p className="max-w-sm text-sm leading-6 text-white/40">Discover models built by independent creators. Access is yours, verifiable, and portable.</p></div><div className="mt-14 flex flex-col gap-4 border-y border-white/10 py-5 sm:flex-row"><div className="relative flex-1"><Search className="absolute left-4 top-3 text-white/30" /><Input placeholder="Search models, categories, creators..." className="h-11 border-white/10 bg-white/5 pl-11 text-white placeholder:text-white/25" /></div><Button variant="outline" className="h-11 border-white/10 bg-transparent text-white/60"><SlidersHorizontal data-icon="inline-start" /> Filters</Button></div><div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 md:grid-cols-2 lg:grid-cols-3">{models.map(([name,category,price,metric])=><a href="/models/vision-transformer-xl" key={name} className="group bg-[#0a0a0a] p-7 transition-colors hover:bg-[#111]"><div className="flex aspect-[1.4] items-end rounded-xl border border-white/10 bg-[radial-gradient(circle_at_65%_40%,rgba(0,220,255,.45),transparent_14%),radial-gradient(circle_at_70%_42%,rgba(255,70,60,.5),transparent_22%),repeating-radial-gradient(ellipse_at_65%_42%,transparent 0,transparent 7px,rgba(255,255,255,.05) 8px,transparent 10px)] p-4"><span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] uppercase tracking-widest text-white/50">On-chain verified</span></div><div className="mt-6 flex items-start justify-between"><div><h2 className="font-serif text-2xl tracking-[-.04em]">{name}</h2><p className="mt-2 text-xs text-white/35">{category} · {metric}</p></div><ArrowUpRight className="text-cyan-300 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></div><p className="mt-5 text-sm text-cyan-200">{price} <span className="text-white/30">access</span></p></a>)}</div></div></main>}
+type ModelListing = [string, string, string, string, string, string]
+
+const models: ModelListing[] = [
+  ['Vision Transformer XL', 'Computer Vision', 'High-resolution image classification with verifiable inference.', '0x71C7…4F2a', '0.18', 'ONNX'],
+  ['Lumen Speech', 'Audio · Speech', 'Expressive, low-latency speech synthesis for production workflows.', '0xA93e…91D0', '0.24', 'PyTorch'],
+  ['Semantic Atlas', 'Language · Embeddings', 'Compact multilingual embeddings for semantic search and retrieval.', '0x2bF1…C8e3', '0.08', 'Safetensors'],
+  ['Delta Forecast', 'Time Series', 'Demand forecasting model with a transparent evaluation card.', '0x920a…88bC', '0.12', 'ONNX'],
+  ['CodeLoom 7B', 'Developer Tools', 'A fine-tuned code completion model for local inference.', '0x9d11…21ef', '0.31', 'GGUF'],
+  ['Latent Studio', 'Image Generation', 'A tuned diffusion model for consistent editorial illustration.', '0x451f…eA79', '0.16', 'Safetensors'],
+]
+
+export default function ExplorePage() {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All categories')
+  const [sort, setSort] = useState('Featured')
+
+  const categories = useMemo(
+    () => ['All categories', ...Array.from(new Set(models.map((model) => model[1])))],
+    [],
+  )
+  const filtered = useMemo(() => {
+    const results = models.filter(
+      (model) =>
+        model.join(' ').toLowerCase().includes(query.trim().toLowerCase()) &&
+        (category === 'All categories' || model[1] === category),
+    )
+    if (sort === 'Price: low to high') results.sort((a, b) => Number(a[4]) - Number(b[4]))
+    if (sort === 'Name: A to Z') results.sort((a, b) => a[0].localeCompare(b[0]))
+    return results
+  }, [query, category, sort])
+
+  function clearFilters() {
+    setQuery('')
+    setCategory('All categories')
+    setSort('Featured')
+  }
+
+  return (
+    <main className="marketplace-shell explore-page">
+      <header className="site-header">
+        <Link href="/" className="brand">
+          <span className="brand-mark"><Orbit size={18} /></span>
+          <span><b>AI MARKETPLACE</b><small>/ @amandx36</small></span>
+        </Link>
+        <nav className="main-nav">
+          <Link href="/explore">Explore</Link>
+          <Link href="/upload">Upload</Link>
+          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/transactions">Transactions</Link>
+          <Link href="/#architecture">Documentation</Link>
+        </nav>
+        <Link href="/login"><Button className="wallet-button">Connect Wallet</Button></Link>
+      </header>
+
+      <div className="explore-container">
+        <div className="section-kicker">OPEN MODEL EXCHANGE <span>ETHEREUM · IPFS</span></div>
+        <div className="explore-heading">
+          <div>
+            <h1>Discover AI Models</h1>
+            <p>Inspect model details, verify creator ownership and IPFS availability, then purchase access using ETH.</p>
+          </div>
+          <span className="explore-count">
+            {filtered.length.toString().padStart(2, '0')} OF {models.length.toString().padStart(2, '0')} MODELS
+          </span>
+        </div>
+
+        <div className="explore-filters">
+          <div className="explore-search">
+            <Search aria-hidden="true" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search models, categories, creator wallets…"
+              aria-label="Search models"
+            />
+          </div>
+          <label className="explore-category-filter">
+            <SlidersHorizontal aria-hidden="true" />
+            <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Filter by category">
+              {categories.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <select className="explore-sort" value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort models">
+            <option>Featured</option>
+            <option>Price: low to high</option>
+            <option>Name: A to Z</option>
+          </select>
+        </div>
+
+        {(query || category !== 'All categories' || sort !== 'Featured') && (
+          <div className="explore-active-filters">
+            <span>Showing {filtered.length} matching models</span>
+            <button onClick={clearFilters}><X aria-hidden="true" /> Clear filters</button>
+          </div>
+        )}
+
+        <div className="explore-grid">
+          {filtered.map(([name, modelCategory, description, wallet, price, format], index) => {
+            const ModelIcon = index % 3 === 0 ? Cpu : index % 3 === 1 ? Database : Orbit
+            return (
+              <article className="catalog-card" key={name}>
+                <div className="catalog-art">
+                  <div className="catalog-art-grid" />
+                  <div className="catalog-model-icon"><ModelIcon aria-hidden="true" /></div>
+                  <span className="catalog-status catalog-ipfs"><i /> IPFS PINNED</span>
+                  <span className="catalog-status catalog-chain"><i /> ON-CHAIN</span>
+                </div>
+                <div className="catalog-body">
+                  <span className="catalog-category">{modelCategory}</span>
+                  <h2>{name}</h2>
+                  <p>{description}</p>
+                  <div className="catalog-meta">
+                    <span>CREATOR <b>{wallet}</b></span>
+                    <span>FORMAT <b>{format}</b></span>
+                  </div>
+                  <div className="catalog-footer">
+                    <div><small>ACCESS PRICE</small><strong>{price} <i>ETH</i></strong></div>
+                    <Link href={`/models/${name.toLowerCase().replaceAll(' ', '-')}`}>
+                      View model <ArrowUpRight aria-hidden="true" />
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="explore-empty">
+            <p>No models match those filters.</p>
+            <button onClick={clearFilters}>Clear filters</button>
+          </div>
+        )}
+      </div>
+    </main>
+  )
+}
