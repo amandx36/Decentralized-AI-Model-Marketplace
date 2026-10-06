@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpStatus;
 // Marking  this class as a Spring Security configuration
 @Configuration
 @EnableWebSecurity
@@ -33,6 +35,9 @@ public class SecurityConfig {
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
 
                 // classifying the which request what to do
                 .authorizeHttpRequests(auth -> auth
@@ -43,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/test/public")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/test/health")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/health")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/model-uploads", "POST")).authenticated()
                         .anyRequest().authenticated()
                 )
 
