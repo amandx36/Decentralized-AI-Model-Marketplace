@@ -178,41 +178,73 @@ Response (200):
 
 ---
 
-##  Authentication Flow
+## Authentication Workflow Map
 
-### Login Process (3 Steps)
+The backend authenticates users by proving control of an Ethereum wallet. It does not use a password for this login flow. The configured context path is `/api`, so the public authentication routes below are called with that prefix.
 
+```mermaid
+sequenceDiagram
+   actor Client
+   participant API as Spring Security / AuthController
+   participant Auth as AuthServiceimpl
+   participant Redis
+   participant Mongo as UserRepository
+   participant Wallet as MetaMask / Wallet
+
+   Client->>API: POST /api/auth/request-nonce { walletAddress }
+   API->>Auth: generateAndSaveNonce(walletAddress)
+   Auth->>Mongo: Find user; create one if missing
+   Auth->>Redis: Store random nonce with 5-minute TTL
+   API-->>Client: Return nonce
+
+   Client->>Wallet: Sign exact nonce with personal_sign (EIP-191)
+   Wallet-->>Client: Return signature
+   Client->>API: POST /api/auth/verify { walletAddress, message, signature }
+   API->>Auth: verifyAndLogin(...)
+   Auth->>Redis: Read nonce for wallet
+   Auth->>Auth: Check message equals stored nonce
+   Auth->>Auth: Recover signer address from signature
+   Auth->>Auth: Compare signer address with walletAddress
+   Auth->>Redis: Delete nonce after successful verification
+   Auth->>Mongo: Update user's modifiedAt
+   Auth->>Auth: Generate access JWT and refresh JWT
+   API-->>Client: Return tokens, walletAddress, role, expiresIn
+
+  Client->>API: Protected request + Authorization: Bearer access-token
+   API->>API: JwtAuthFilter parses JWT and extracts wallet address
+   API->>Mongo: Load user by wallet address
+   API->>API: Build UserPrincipal and set SecurityContext
+   API-->>Client: Continue to protected controller
 ```
-1. Frontend requests nonce
-   ├─> Backend generates random hex string
-   ├─> Stores nonce in Redis (5 min expiry)
-   └─> Returns nonce to frontend
 
-2. Frontend signs nonce with MetaMask
-   ├─> User approves signature in wallet
-   └─> Frontend sends nonce + signature to backend
+### Login steps
 
-3. Backend verifies signature
-   ├─> Validates nonce exists & not expired
-   ├─> Recovers wallet address from signature
-   ├─> Compares recovered address with request address
-   ├─> Deletes nonce (prevent replay attacks)
-   ├─> Generates JWT access token (24 hours)
-   ├─> Generates refresh token (7 days)
-   └─> Returns tokens to frontend
-```
+1. **Request a challenge:** `POST /api/auth/request-nonce` with `{ "walletAddress": "0x..." }`. If this is a new wallet, a user record is created at this point—before wallet ownership is verified. A cryptographically random 32-byte nonce is stored in Redis for five minutes.
+2. **Sign the challenge:** The client asks the wallet to sign the exact nonce using Ethereum `personal_sign` / EIP-191.
+3. **Verify and log in:** `POST /api/auth/verify` with `walletAddress`, the nonce as `message`, and the signature. The service checks the stored nonce and exact message match, recovers the signer address, and checks it matches the requested wallet (case-insensitive). On success it deletes the nonce and returns JWTs.
 
-### Token Structure
+### Authenticated API requests
 
-**Access Token:** 24 hours expiration
-- Used for API requests
-- Include in `Authorization: Bearer <token>` header
-- Expires quickly for security
+- Spring Security is stateless; it does not keep an HTTP login session.
+- Send the access token as `Authorization: Bearer <token>`.
+- `JwtAuthFilter` validates/parses the signed token, loads the MongoDB user by wallet address, creates a `UserPrincipal`, and places the authentication in Spring Security's context.
+- Requests without valid authentication are rejected on protected routes. The security configuration explicitly permits the auth routes, `/test/public`, `/test/health`, and `/health`; all other routes require authentication.
+- `UserPrincipal` derives authorities from the user's stored roles. Returning a role string in the login response does not itself assign that role to the stored user.
 
-**Refresh Token:** 7 days expiration
-- Used to obtain new access token
-- Stored securely on frontend
-- Longer expiration for convenience
+### Refresh-token flow
+
+`POST /api/auth/refresh` accepts `{ "refreshToken": "..." }` without an access-token header. If the signed token is not expired, the backend creates a new access token and returns the same refresh token. There is currently no refresh-token rotation or revocation.
+
+### Token lifetimes and configuration
+
+The access and refresh lifetimes are configured in milliseconds through `JWT_EXPIRATION` and `JWT_REFRESH_EXPIRATION`; `expiresIn` in the response is the access-token lifetime in seconds. `JWT_SECRET` is used to sign and validate both token types. Configure these values in the environment; do not commit the secret.
+
+### Implementation reminders
+
+- `/auth/login` is permitted by the security configuration, but the current `AuthController` does not implement a `/login` handler; wallet login is `/auth/verify`.
+- Access and refresh JWTs currently use the same signing/claim format without a token-type claim. The bearer-token filter does not distinguish them, so an unexpired refresh token can also pass as a bearer token on protected endpoints.
+- New users are created before signature verification and the nonce-registration path does not assign a role. The service falls back to returning `ROLE_USER` in its response when roles are empty, but `UserPrincipal` will have no authorities in that case.
+- Avoid logging signatures, nonce values, or refresh tokens. The current controller/service contains debug logging of authentication values.
 
 ---
 
@@ -352,7 +384,7 @@ server:
 
 1. **Security Enhancements:**
    - Fixed critical missing dependency injection in JwtAuthFilter
-   - Added refresh token mechanism for token rotation
+  - Added a refresh-token endpoint; the current implementation reuses the refresh token rather than rotating it
    - Nonce expiry prevents replay attacks
 
 2. **Code Quality:**
@@ -479,7 +511,7 @@ axios.interceptors.request.use((config) => {
 | 400 | "Signature mismatch" | Recovered address ≠ wallet address | Sign with correct wallet |
 | 401 | "User not found" | Wallet not in database | Contact admin |
 | 401 | "Unauthorized" | Invalid or expired JWT token | Use refresh endpoint |
-| 401 | "Refresh token has expired" | Refresh token > 7 days old | Request new nonce and login again |
+| 401 | "Refresh token has expired" | Configured refresh-token lifetime has elapsed | Request a new nonce and log in again |
 
 ---
 
