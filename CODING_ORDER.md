@@ -83,7 +83,7 @@ Write basic tests:
 - Can't purchase twice
 - `hasAccess` returns correct value
 
-Run: `npx hardhat test` — all should pass ✅
+Run: `npx hardhat test` — all should pass 
 
 ---
 
@@ -95,11 +95,11 @@ Print the addresses after deploy.
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-**🚨 Copy the 2 addresses it prints. You'll need them in Phase 2.**
+** Copy the 2 addresses it prints. You'll need them in Phase 2.**
 
 ---
 
-## PHASE 2 — Java Spring Boot Backend ☕
+## PHASE 2 — Java Spring Boot Backend 
 *Build in this exact order inside the backend folder.*
 
 ```bash
@@ -423,7 +423,7 @@ And finish `InferenceController.java` → `POST /api/infer`
 
 ---
 
-## PHASE 4 — React Frontend 🌐
+## PHASE 4 — React Frontend 
 *Build after backend is working and tested.*
 
 ---
@@ -536,7 +536,7 @@ Multi-step form:
 
 ---
 
-## ✅ Final Checklist Before Calling It Done
+##  Final Checklist Before Calling It Done
 
 ```
 Blockchain

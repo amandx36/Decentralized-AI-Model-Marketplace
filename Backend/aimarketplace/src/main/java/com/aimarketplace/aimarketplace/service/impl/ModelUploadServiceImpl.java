@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Service
 public class ModelUploadServiceImpl implements ModelUploadService  {
-
+   
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".onnx", ".pt", ".pkl", ".safetensors");
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "application/octet-stream", "application/onnx", "application/x-pytorch",
@@ -37,7 +37,7 @@ public class ModelUploadServiceImpl implements ModelUploadService  {
     @Override
     public CreateModelUploadResponse createUpload(CreateModelUploadRequest request, String walletAddress) {
         validate(request, walletAddress);
-
+System.out.println("Reached to the model upload service implementation");
         Instant now = Instant.now();
         Instant expiresAt = now.plusSeconds(sessionLifetimeMinutes * 60);
         ModelUpload saved = modelUploadRepository.save(new ModelUpload(
