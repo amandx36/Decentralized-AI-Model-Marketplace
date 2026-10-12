@@ -11,13 +11,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/model-uploads")
+@RequestMapping("/v1/model-uploads")
 public class ModelUploadController {
 
     private final ModelUploadServiceImpl modelUploadService;
 
     public ModelUploadController(ModelUploadServiceImpl modelUploadService) {
         this.modelUploadService = modelUploadService;
+        System.out.println("ModelUploadController initialized with ModelUploadServiceImpl");
     }
     
 @PostMapping
@@ -25,6 +26,7 @@ public ResponseEntity<CreateModelUploadResponse> createUpload(
         @RequestBody CreateModelUploadRequest request,
         Authentication authentication
 ) {
+        System.out.println("Reached to the create upload controller method");
     if (authentication == null ||
             !authentication.isAuthenticated() ||
             !(authentication.getPrincipal() instanceof UserPrincipal)) {
@@ -41,6 +43,7 @@ public ResponseEntity<CreateModelUploadResponse> createUpload(
     CreateModelUploadResponse response =
             modelUploadService.createUpload(request, walletAddress);
 
+    System.out.println("Model upload created successfully");
     return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(response);
