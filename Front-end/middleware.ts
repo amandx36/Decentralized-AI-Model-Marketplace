@@ -1,7 +1,7 @@
 /**
  * middleware.ts
  *
- * Protects /dashboard and /upload — redirects unauthenticated visitors to /login.
+ * Protects authenticated application pages — redirects unauthenticated visitors to /login.
  * Runs on the Edge Runtime so we read cookies directly from the request (no
  * `next/headers` import).
  */
@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { COOKIE_TOKEN } from '@/lib/auth'
 
 // Routes that require a valid session
-const PROTECTED = ['/dashboard']    // bypassing the /upload so that i can develop it '/upload']
+const PROTECTED = ['/dashboard', '/upload', '/modelToPinna']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
   // No token — redirect to login, preserving the intended destination
   const loginUrl = request.nextUrl.clone()
   loginUrl.pathname = '/login'
-  loginUrl.searchParams.set('from', pathname)
+  loginUrl.searchParams.set('from', `${pathname}${request.nextUrl.search}`)
   return NextResponse.redirect(loginUrl)
 }
 

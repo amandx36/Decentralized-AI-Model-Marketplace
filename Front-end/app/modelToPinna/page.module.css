@@ -1,0 +1,74 @@
+.container {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 32px 20px;
+  color: #f4f4f5;
+  background: radial-gradient(ellipse at 50% 40%, rgb(15 50 60 / 35%), transparent 52%), #030506;
+}
+
+.card {
+  display: flex;
+  width: min(100%, 620px);
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 36px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 24px;
+  background: rgb(12 16 18 / 86%);
+  text-align: center;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 40%);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #76e0cc;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+
+.card h1 {
+  margin: 0;
+  font-size: clamp(26px, 5vw, 38px);
+  letter-spacing: -.04em;
+}
+
+.message {
+  max-width: 460px;
+  margin: 14px 0 0;
+  color: #b3bdc1;
+  line-height: 1.6;
+}
+
+.successMark,
+.errorMark {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 22px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.successMark { color: #081a17; background: #76e0cc; }
+.errorMark { color: #fff; background: #b94242; }
+
+.cid {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  margin: 24px 0 0;
+  text-align: left;
+}
+
+.cid span { color: #76e0cc; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.cid code { overflow-wrap: anywhere; color: #e6edef; }
+
+.backLink {
+  margin-top: 24px;
+  color: #76e0cc;
+  text-underline-offset: 4px;
+}

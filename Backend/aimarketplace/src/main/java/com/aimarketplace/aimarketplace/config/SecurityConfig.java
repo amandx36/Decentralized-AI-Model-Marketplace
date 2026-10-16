@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/test/health")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/health")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/v1/model-uploads", "POST")).authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/model-uploads/**")).authenticated()
                         .anyRequest().authenticated()
                 )
 

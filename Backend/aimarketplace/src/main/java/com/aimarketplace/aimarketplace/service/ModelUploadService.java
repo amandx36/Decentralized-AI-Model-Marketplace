@@ -3,5 +3,7 @@ import com.aimarketplace.aimarketplace.dto.response.*;
 import com.aimarketplace.aimarketplace.dto.request.*;
 public interface ModelUploadService {
     CreateModelUploadResponse createUpload(CreateModelUploadRequest request, String walletAddress);
+    CreateUploadAuthorizationResponse createUploadAuthorization(String uploadId, String walletAddress);
+    CreateModelUploadResponse completeUpload(String uploadId, CompleteModelUploadRequest request, String walletAddress);
     void validate(CreateModelUploadRequest request, String walletAddress);
 }

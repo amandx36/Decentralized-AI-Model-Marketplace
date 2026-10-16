@@ -10,4 +10,8 @@ public class CreateModelUploadRequest {
     private Long fileSize;
 
     private String contentType;
+    private String modelName;
+    private String description;
+    private String category;
+    private Double price;
 }

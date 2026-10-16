@@ -1,0 +1,89 @@
+.spinnerHost {
+  --r: 3em;
+  --g: 8px;
+  --t: 1s;
+
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  width: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+.spinner {
+  display: grid;
+  place-items: center;
+}
+
+.tri {
+  --s: 1;
+
+  display: grid;
+  grid-area: 1 / 1;
+  place-self: center;
+
+  transform: rotate(calc(var(--k) * 1turn))
+    translateY(calc(var(--r) + var(--g)));
+}
+
+.tri:nth-child(even) {
+  --s: -1;
+}
+
+.layer {
+  --o: calc(var(--c) - 0.5 * (var(--m) - 1));
+
+  grid-area: 1 / 1;
+  padding: var(--r);
+
+  color: hsl(var(--hue) 100% 50%);
+  background: currentColor;
+
+  clip-path: polygon(50% 0%, 93.301% 75%, 6.699% 75%);
+
+  mix-blend-mode: screen;
+
+  rotate: calc(var(--oa) * 1deg);
+
+  animation:
+    shrink var(--t) ease-in infinite alternate,
+    rotateLayer calc(2 * var(--t))
+      cubic-bezier(
+        calc(0.75 + var(--o) * 0.1),
+        0,
+        calc(0.25 - var(--o) * 0.1),
+        1
+      )
+      infinite;
+
+  animation-delay: var(--delay), var(--delay);
+}
+
+@supports (background: conic-gradient(red, tan)) {
+  .layer {
+    background: conic-gradient(
+      from 150deg at 50% 0,
+      currentColor 0% 60deg,
+      transparent 60deg
+    );
+  }
+}
+
+@keyframes shrink {
+  to {
+    scale: 0;
+  }
+}
+
+@keyframes rotateLayer {
+  to {
+    rotate: calc(var(--oa) * 1deg + var(--s) * 120deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer {
+    animation: none;
+  }
+}
