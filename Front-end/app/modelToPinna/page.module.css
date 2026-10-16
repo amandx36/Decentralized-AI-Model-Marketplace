@@ -1,0 +1,12 @@
+.container {
+  background:
+    radial-gradient(
+      ellipse at 50% 55%,
+      rgb(12 25 36 / 35%),
+      transparent 48%
+    ),
+    #030303;
+
+  height: 100%;
+  width: 100%;
+}

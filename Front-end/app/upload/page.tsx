@@ -3,10 +3,12 @@ import { createModelUpload } from '@/lib/api/model-upload'
 import { useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent, FormEvent, KeyboardEvent } from 'react'
 import { ArrowLeft, Check, FileUp, Trash2, UploadCloud } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import './page.css'
+import { Toaster, toast } from 'sonner'
 
 // Allowed file types for model uploads.
 const ALLOWED_EXTENSIONS = ['.onnx', '.pt', '.pkl', '.safetensors']
@@ -39,6 +41,8 @@ function formatFileSize(sizeInBytes: number): string {
 }
 
 export default function UploadPage() {
+  const router = useRouter()
+
   // This ref lets us trigger the hidden file input from the button or dropzone.
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -48,7 +52,6 @@ export default function UploadPage() {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
   const [price, setPrice] = useState('')
-
   // UI state: drag effect, form status, progress bar, and validation messages.
   const [isDragging, setIsDragging] = useState(false)
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle')
@@ -127,7 +130,11 @@ export default function UploadPage() {
       errors.price = 'Price must be a valid, non-negative number.'
     }
 
-    if (!file) errors.file = 'Select a supported model file before publishing.'
+    if (!file) {
+      errors.file = 'Select a supported model file before publishing.'
+    } else if (file.size <= 0) {
+      errors.file = 'The selected model file is empty.'
+    }
 
     return errors
   }
@@ -162,10 +169,14 @@ export default function UploadPage() {
 
       setUploadStatus('success')
       setProgress(100)
-      setStatusMessage('Model details submitted and upload session created successfully.')
+      setStatusMessage('Upload authority granted. Redirecting you to the model upload step…')
+      toast.success('Upload authority granted. Continue to upload your model file.')
+      window.setTimeout(() => router.push('/modelToPinna'), 2000)
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to submit model details.'
       setUploadStatus('error')
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to submit model details.')
+      setStatusMessage(message)
+      toast.error(message)
     }
   }
 
@@ -180,6 +191,7 @@ export default function UploadPage() {
   return (
     <main className="upload-page">
       <header className="upload-header">
+        <Toaster richColors position="top-right" />
         <div className="upload-header-inner">
           <a href="/" className="upload-brand">
             AI MARKETPLACE <span>/ @amandx36</span>
@@ -269,8 +281,9 @@ export default function UploadPage() {
             </div>
 
             <Button className="upload-publish-button" type="submit" disabled={uploadStatus === 'uploading'}>
-              {uploadStatus === 'uploading' ? 'Preparing upload…' : 'Publish model'}
+              {uploadStatus === 'uploading' ? 'Requesting upload authority…' : 'Get upload authority'}
               <Check aria-hidden="true" data-icon="inline-end" />
+
             </Button>
 
             {statusMessage && (
@@ -364,7 +377,6 @@ export default function UploadPage() {
                   <span>Submitting model details</span>
                   <span>{progress}%</span>
                 </div>
-
                 <div
                   className="upload-progress-track"
                   role="progressbar"
