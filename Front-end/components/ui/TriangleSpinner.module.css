@@ -5,8 +5,9 @@
 
   display: grid;
   place-items: center;
-  min-height: 100vh;
-  background: #000;
+  min-height: 170px;
+  width: 100%;
+  background: transparent;
   overflow: hidden;
 }
 

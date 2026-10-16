@@ -1,5 +1,6 @@
 'use client'
 import { createModelUpload } from '@/lib/api/model-upload'
+import { saveUploadFile } from '@/lib/model-upload-file'
 import { useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent, FormEvent, KeyboardEvent } from 'react'
 import { ArrowLeft, Check, FileUp, Trash2, UploadCloud } from 'lucide-react'
@@ -157,7 +158,7 @@ export default function UploadPage() {
       setProgress(0)
       setStatusMessage('Sending model details to the backend...')
 
-      await createModelUpload({
+      const session = await createModelUpload({
         modelName: modelName.trim(),
         description: description.trim(),
         category: category.trim(),
@@ -167,11 +168,13 @@ export default function UploadPage() {
         contentType: file.type || 'application/octet-stream',
       })
 
+      await saveUploadFile(session.uploadId, file)
+
       setUploadStatus('success')
       setProgress(100)
       setStatusMessage('Upload authority granted. Redirecting you to the model upload step…')
       toast.success('Upload authority granted. Continue to upload your model file.')
-      window.setTimeout(() => router.push('/modelToPinna'), 2000)
+      window.setTimeout(() => router.push(`/modelToPinna?uploadId=${encodeURIComponent(session.uploadId)}`), 700)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to submit model details.'
       setUploadStatus('error')

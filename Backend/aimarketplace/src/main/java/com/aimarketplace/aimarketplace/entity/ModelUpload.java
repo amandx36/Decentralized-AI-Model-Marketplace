@@ -23,6 +23,13 @@ public class ModelUpload {
     private String fileName;
     private Long fileSize;
     private String contentType;
+    private String cid;
+    private String pinataFileId;
+    private Long actualSize;
+    private String modelName;
+    private String description;
+    private String category;
+    private Double price;
     private String status;
     private Instant createdAt;
     private Instant expiresAt;

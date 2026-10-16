@@ -8,7 +8,13 @@ export interface CreateModelUploadInput {
   contentType: string
 }
 
-export async function createModelUpload(input: CreateModelUploadInput): Promise<unknown> {
+export interface CreateModelUploadResponse {
+  uploadId: string
+  status: string
+  expiresAt: string
+}
+
+export async function createModelUpload(input: CreateModelUploadInput): Promise<CreateModelUploadResponse> {
   const response = await fetch('/api/upload/model-upload', {
     method: 'POST',
     credentials: 'same-origin',
@@ -37,5 +43,10 @@ export async function createModelUpload(input: CreateModelUploadInput): Promise<
     throw new Error(message)
   }
 
-  return responseBody
+  if (!responseBody || typeof responseBody !== 'object' || !('uploadId' in responseBody) ||
+      typeof responseBody.uploadId !== 'string') {
+    throw new Error('The upload service returned an invalid upload session.')
+  }
+
+  return responseBody as CreateModelUploadResponse
 }
